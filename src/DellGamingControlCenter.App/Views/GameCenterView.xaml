@@ -1,0 +1,82 @@
+<UserControl x:Class="DellGamingControlCenter.App.Views.GameCenterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Text="Game Center" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center"/>
+            
+            <TextBox Grid.Column="1" Width="250" Margin="20,0" Padding="10,5" VerticalAlignment="Center" 
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Background="{StaticResource AppBackgroundSecondary}" 
+                     Foreground="{StaticResource AppTextPrimary}" 
+                     BorderBrush="{StaticResource AppBorder}" 
+                     BorderThickness="1"/>
+                     
+            <Button Grid.Column="2" Content="SCAN" Command="{Binding ScanCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+            <Button Grid.Column="3" Content="ADD GAME" Command="{Binding AddGameCommand}" Style="{StaticResource SecondaryButtonStyle}"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding FilteredGames}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,15">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Icon Placeholder -->
+                                <Border Grid.Column="0" Width="64" Height="64" Background="{StaticResource AppBackgroundPrimary}" CornerRadius="4" Margin="0,0,20,0">
+                                    <TextBlock Text="exe" Foreground="{StaticResource AppTextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Details -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AppTextPrimary}" Margin="0,0,0,5"/>
+                                    <TextBlock Text="{Binding ExecutablePath}" FontSize="12" Foreground="{StaticResource AppTextSecondary}"/>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Border Background="{StaticResource AppBackgroundPrimary}" CornerRadius="4" Padding="8,4" Margin="0,0,10,0">
+                                            <TextBlock Text="{Binding DriveLetter}" Foreground="{StaticResource AppTextSecondary}" FontSize="11"/>
+                                        </Border>
+                                        <Border Background="{StaticResource AppBackgroundPrimary}" CornerRadius="4" Padding="8,4" Margin="0,0,10,0">
+                                            <TextBlock Text="AMD Radeon 520" Foreground="{StaticResource AppTextSecondary}" FontSize="11"/>
+                                        </Border>
+                                        <Border Background="{StaticResource AppBackgroundPrimary}" CornerRadius="4" Padding="8,4">
+                                            <TextBlock Text="{Binding ProfileState}" Foreground="{StaticResource AppTextSecondary}" FontSize="11"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <!-- Actions -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="PROFILE" Command="{Binding DataContext.ProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Id}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                                    <Button Content="OPTIMIZE" Command="{Binding DataContext.OptimizeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Id}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                                    <Button Content="PLAY" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Id}" Style="{StaticResource ActionButtonStyle}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

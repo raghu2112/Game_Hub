@@ -1,0 +1,93 @@
+<UserControl x:Class="DellGamingControlCenter.App.Views.BenchmarkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             Background="{StaticResource AppBackgroundPrimary}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Benchmark Center" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AppAccent}" Margin="0,0,0,20"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Games List -->
+            <Border Background="{StaticResource AppBackgroundSecondary}" CornerRadius="8" Padding="10" Margin="0,0,10,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Discovered Games" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    
+                    <ListBox Grid.Row="1" ItemsSource="{Binding DiscoveredGames}" SelectedValue="{Binding SelectedGameId}" SelectedValuePath="Id" 
+                             Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" Padding="5" Foreground="{StaticResource AppTextPrimary}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Detail View -->
+            <Border Grid.Column="1" Background="{StaticResource AppBackgroundSecondary}" CornerRadius="8" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Performance Status" FontWeight="Bold" FontSize="20" Margin="0,0,0,10"/>
+                    
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Best Health Score" Foreground="{StaticResource AppTextSecondary}"/>
+                            <TextBlock Text="{Binding BestHealthScore}" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Primary Bottleneck" Foreground="{StaticResource AppTextSecondary}"/>
+                            <TextBlock Text="{Binding PrimaryBottleneck}" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Confidence" Foreground="{StaticResource AppTextSecondary}"/>
+                            <TextBlock Text="{Binding Confidence}" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Actions" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <Button Content="Run Baseline Benchmark" Command="{Binding StartBaselineCommand}" Padding="15,10" Margin="0,0,10,0" Background="{StaticResource AppBackgroundTertiary}" Foreground="{StaticResource AppTextPrimary}"/>
+                        <Button Content="Run Tuned Benchmark" Command="{Binding StartTunedCommand}" Padding="15,10" Margin="0,0,10,0" Background="{StaticResource AppAccent}" Foreground="{StaticResource AppBackgroundPrimary}" FontWeight="Bold"/>
+                        <Button Content="Cancel" Command="{Binding CancelCommand}" Padding="15,10" Background="DarkRed" Foreground="White" FontWeight="Bold"/>
+                    </StackPanel>
+                    
+                    <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource AppAccent}" FontWeight="Bold" Margin="0,0,0,20"/>
+                    
+                    <TextBlock Text="Benchmark History" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    <ListView ItemsSource="{Binding BenchmarkHistory}" Background="Transparent" BorderThickness="0">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
+                                <GridViewColumn Header="Is Baseline" DisplayMemberBinding="{Binding IsBaseline}" Width="80"/>
+                                <GridViewColumn Header="Health Score" DisplayMemberBinding="{Binding Result.HealthScore}" Width="100"/>
+                                <GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding Timestamp}" Width="150"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

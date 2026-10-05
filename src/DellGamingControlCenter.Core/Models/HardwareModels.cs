@@ -1,0 +1,199 @@
+namespace DellGamingControlCenter.Core.Models;
+
+using DellGamingControlCenter.Core.Enums;
+
+// ─── CPU ────────────────────────────────────────────────────────────────
+
+public sealed class CpuInfo
+{
+    public string Manufacturer { get; init; } = "Unknown";
+    public string Model { get; init; } = "Unknown";
+    public string Architecture { get; init; } = "Unknown";
+    public int Cores { get; init; }
+    public int Threads { get; init; }
+    public double BaseClockMHz { get; init; }
+    public double MaxClockMHz { get; init; }
+    public int L2CacheKB { get; init; }
+    public int L3CacheKB { get; init; }
+    public string Socket { get; init; } = "Unknown";
+    public bool HasTurboBoost { get; init; }
+    public bool PowerManagementSupported { get; init; }
+}
+
+public sealed class CpuMetrics
+{
+    public double UsagePercent { get; init; }
+    public double CurrentClockMHz { get; init; }
+    public double? TemperatureCelsius { get; init; }
+    public double? PackagePowerWatts { get; init; }
+    public bool? IsThermalThrottling { get; init; }
+    public double[] PerCoreUsage { get; init; } = [];
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+// ─── GPU ────────────────────────────────────────────────────────────────
+
+public sealed class GpuInfo
+{
+    public string Name { get; init; } = "Unknown";
+    public string Manufacturer { get; init; } = "Unknown";
+    public GpuType Type { get; init; } = GpuType.Unknown;
+    public long VramBytes { get; init; }
+    public string DriverVersion { get; init; } = "Unknown";
+    public DateTime? DriverDate { get; init; }
+    public string VideoProcessor { get; init; } = "Unknown";
+    public string PnpDeviceId { get; init; } = "";
+    public int? CurrentResolutionWidth { get; init; }
+    public int? CurrentResolutionHeight { get; init; }
+    public int? RefreshRate { get; init; }
+    public string Status { get; init; } = "Unknown";
+}
+
+public sealed class GpuMetrics
+{
+    public double? UsagePercent { get; init; }
+    public double? TemperatureCelsius { get; init; }
+    public double? CoreClockMHz { get; init; }
+    public double? MemoryClockMHz { get; init; }
+    public double? PowerWatts { get; init; }
+    public long? VramUsedBytes { get; init; }
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+// ─── RAM ────────────────────────────────────────────────────────────────
+
+public sealed class RamModule
+{
+    public string BankLabel { get; init; } = "";
+    public string DeviceLocator { get; init; } = "";
+    public long CapacityBytes { get; init; }
+    public int SpeedMHz { get; init; }
+    public string Manufacturer { get; init; } = "Unknown";
+    public string PartNumber { get; init; } = "";
+}
+
+public sealed class RamInfo
+{
+    public long TotalBytes { get; set; }
+    public int ModuleCount { get; set; }
+    public bool IsDualChannel { get; set; }
+    public int SpeedMHz { get; set; }
+    public List<RamModule> Modules { get; set; } = [];
+}
+
+public sealed class RamMetrics
+{
+    public long TotalBytes { get; init; }
+    public long UsedBytes { get; init; }
+    public long AvailableBytes { get; init; }
+    public long CommitTotalBytes { get; init; }
+    public long CommitLimitBytes { get; init; }
+    public double UsagePercent { get; init; }
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+// ─── Storage ────────────────────────────────────────────────────────────
+
+public sealed class StorageDrive
+{
+    public string Model { get; init; } = "Unknown";
+    public StorageType Type { get; init; } = StorageType.Unknown;
+    public string InterfaceType { get; init; } = "Unknown";
+    public long SizeBytes { get; init; }
+    public string Status { get; init; } = "Unknown";
+    public string SerialNumber { get; init; } = "";  // Never display or upload
+    public int Partitions { get; init; }
+}
+
+public sealed class StorageVolume
+{
+    public string DriveLetter { get; init; } = "";
+    public string FileSystem { get; init; } = "";
+    public long SizeBytes { get; init; }
+    public long FreeSpaceBytes { get; init; }
+    public string VolumeName { get; init; } = "";
+    public bool IsSystemDrive { get; init; }
+    public double UsagePercent => SizeBytes > 0 ? (1.0 - (double)FreeSpaceBytes / SizeBytes) * 100.0 : 0;
+}
+
+// ─── Battery ────────────────────────────────────────────────────────────
+
+public sealed class BatteryInfo
+{
+    public string Manufacturer { get; init; } = "Unknown";
+    public string DeviceId { get; init; } = "";
+    public string Chemistry { get; init; } = "Unknown";
+    public int DesignCapacityMWh { get; init; }
+    public int FullChargeCapacityMWh { get; init; }
+    public double WearPercent { get; init; }
+    public int CycleCount { get; init; }
+    public double DesignVoltage { get; init; }
+}
+
+public sealed class BatteryMetrics
+{
+    public int ChargePercent { get; init; }
+    public bool IsAcConnected { get; init; }
+    public bool IsCharging { get; init; }
+    public int? EstimatedMinutesRemaining { get; init; }
+    public double? TemperatureCelsius { get; init; }
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+// ─── Motherboard / System ───────────────────────────────────────────────
+
+public sealed class SystemInfo
+{
+    public string Manufacturer { get; init; } = "Unknown";
+    public string Model { get; init; } = "Unknown";
+    public string SystemType { get; init; } = "Unknown";
+    public string BiosVersion { get; init; } = "Unknown";
+    public DateTime? BiosDate { get; init; }
+    public string MotherboardProduct { get; init; } = "Unknown";
+    public string MotherboardVersion { get; init; } = "Unknown";
+    public string OsCaption { get; init; } = "Unknown";
+    public string OsVersion { get; init; } = "Unknown";
+    public string OsBuild { get; init; } = "Unknown";
+    public string OsArchitecture { get; init; } = "Unknown";
+}
+
+// ─── Thermal ────────────────────────────────────────────────────────────
+
+public sealed class ThermalMetrics
+{
+    public double? CpuTemperature { get; init; }
+    public double? GpuTemperature { get; init; }
+    public double? SsdTemperature { get; init; }
+    public int? FanRpm { get; init; }
+    public ThermalState CpuThermalState { get; init; } = ThermalState.Unknown;
+    public ThermalState GpuThermalState { get; init; } = ThermalState.Unknown;
+    public bool? IsCpuThrottling { get; init; }
+    public bool? IsGpuThrottling { get; init; }
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+// ─── Network ────────────────────────────────────────────────────────────
+
+public sealed class NetworkAdapterInfo
+{
+    public string Name { get; init; } = "Unknown";
+    public string MacAddress { get; init; } = "";
+    public bool DhcpEnabled { get; init; }
+    public string[] DnsServers { get; init; } = [];
+    public string? DefaultGateway { get; init; }
+}
+
+// ─── Complete Hardware Snapshot ──────────────────────────────────────────
+
+public sealed class HardwareSnapshot
+{
+    public SystemInfo System { get; init; } = new();
+    public CpuInfo Cpu { get; init; } = new();
+    public List<GpuInfo> Gpus { get; init; } = [];
+    public RamInfo Ram { get; init; } = new();
+    public List<StorageDrive> Drives { get; init; } = [];
+    public List<StorageVolume> Volumes { get; init; } = [];
+    public BatteryInfo? Battery { get; init; }
+    public List<NetworkAdapterInfo> NetworkAdapters { get; init; } = [];
+    public DateTime DetectedAt { get; init; } = DateTime.UtcNow;
+}

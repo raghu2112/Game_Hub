@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>DellGamingControlCenter.App</RootNamespace>
+    <AssemblyName>DellGamingControlCenter</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Title>Dell Gaming &amp; Performance Control Center</Title>
+    <Description>Lightweight hardware tuning and gaming optimization for Dell Inspiron 3576. This is an independent utility and is not affiliated with Dell Technologies.</Description>
+    <Company>Independent</Company>
+    <Product>Dell Gaming &amp; Performance Control Center</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DellGamingControlCenter.Core\DellGamingControlCenter.Core.csproj" />
+    <ProjectReference Include="..\DellGamingControlCenter.Services\DellGamingControlCenter.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+</Project>

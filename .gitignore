@@ -1,0 +1,25 @@
+# Visual Studio / .NET
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.user
+*.suo
+.vs/
+*.userprefs
+*.sln.docstates
+
+# Build artifacts
+publish/
+*.zip
+*.msi
+*.exe
+*.dll
+*.pdb
+*.cache
+*.nupkg
+
+# Logs
+*.log
+
+# Temp
+.dotnet/
