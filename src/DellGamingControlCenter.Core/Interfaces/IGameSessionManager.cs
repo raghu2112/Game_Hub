@@ -15,4 +15,16 @@ public interface IGameSessionManager
     
     /// <summary>Called by the background watcher when the game process actually exits.</summary>
     Task HandleProcessExitAsync(string sessionId);
+
+    /// <summary>Fires when a session starts or ends, or its state changes.</summary>
+    event EventHandler<GameSessionEventArgs>? SessionChanged;
+
+    /// <summary>Returns the currently active session, if any.</summary>
+    GameSession? GetActiveSession();
+}
+
+public class GameSessionEventArgs : EventArgs
+{
+    public GameSession Session { get; }
+    public GameSessionEventArgs(GameSession session) => Session = session;
 }

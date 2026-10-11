@@ -10,6 +10,8 @@
 
 # Build artifacts
 publish/
+build/
+dist/
 *.zip
 *.msi
 *.exe
@@ -21,5 +23,8 @@ publish/
 # Logs
 *.log
 
-# Temp
+# Temp & Test Results
 .dotnet/
+tmp/
+TestResults/
+.freebuff/

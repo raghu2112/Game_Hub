@@ -1,10 +1,10 @@
 <Window x:Class="DellGamingControlCenter.App.Views.SmartOptimizerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Smart Optimizer" Height="600" Width="800"
+        Title="Smart Optimizer" Height="620" Width="820"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource AppBackgroundPrimary}"
-        Foreground="{StaticResource AppTextPrimary}"
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource PrimaryFont}">
     <Grid Margin="30">
         <Grid.RowDefinitions>
@@ -14,8 +14,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="SMART OPTIMIZER" Style="{StaticResource SubheaderTextStyle}" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding GameName}" Style="{StaticResource HeaderTextStyle}"/>
+            <TextBlock Text="SMART OPTIMIZER" Style="{StaticResource SubheaderStyle}"/>
+            <TextBlock Text="{Binding GameName}" Style="{StaticResource PageTitleStyle}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <Border Grid.Row="1" Style="{StaticResource CardStyle}">
@@ -32,7 +32,7 @@
 
                 <!-- Plan -->
                 <StackPanel Grid.Row="1" Visibility="{Binding HasPlan, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock Text="OPTIMIZATION PLAN" Style="{StaticResource SubheaderTextStyle}" Margin="0,0,0,10"/>
+                    <TextBlock Text="OPTIMIZATION PLAN" Style="{StaticResource SubheaderStyle}" Margin="0,0,0,10"/>
                     
                     <ItemsControl ItemsSource="{Binding PlanActions}">
                         <ItemsControl.ItemTemplate>
@@ -56,7 +56,7 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="CANCEL" IsCancel="True" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
-            <Button Content="APPLY OPTIMIZATION" Command="{Binding ApplyCommand}" Style="{StaticResource ActionButtonStyle}" IsEnabled="{Binding HasPlan}"/>
+            <Button Content="APPLY OPTIMIZATION" Command="{Binding ApplyCommand}" Style="{StaticResource ActionButtonStyle}" IsEnabled="{Binding HasPlan}" Padding="18,9"/>
         </StackPanel>
     </Grid>
 </Window>

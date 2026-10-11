@@ -11,14 +11,13 @@
             
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             
+            <!-- Application-wide defaults using semantic tokens -->
             <Style TargetType="Window">
-                <Setter Property="Background" Value="{StaticResource AppBackgroundPrimary}"/>
-                <Setter Property="Foreground" Value="{StaticResource AppTextPrimary}"/>
-                <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
-            </Style>
-            <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="{StaticResource AppTextPrimary}"/>
+                <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
                 <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"/>
             </Style>
         </ResourceDictionary>

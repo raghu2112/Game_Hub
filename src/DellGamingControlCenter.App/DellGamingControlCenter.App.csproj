@@ -9,10 +9,13 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Title>Dell Gaming &amp; Performance Control Center</Title>
-    <Description>Lightweight hardware tuning and gaming optimization for Dell Inspiron 3576. This is an independent utility and is not affiliated with Dell Technologies.</Description>
+    <Title>GamerHub — PC Gaming Control Center</Title>
+    <Description>Lightweight hardware tuning and gaming optimization for Windows gaming laptops and desktops. An independent utility.</Description>
     <Company>Independent</Company>
-    <Product>Dell Gaming &amp; Performance Control Center</Product>
+    <Product>GamerHub</Product>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <ApplicationIcon>..\..\assets\GamerHub.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

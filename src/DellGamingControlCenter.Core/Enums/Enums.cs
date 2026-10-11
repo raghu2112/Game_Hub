@@ -1,5 +1,34 @@
 namespace DellGamingControlCenter.Core.Enums;
 
+/// <summary>Hardware capabilities detectable in the system.</summary>
+public enum HardwareCapability
+{
+    CpuTelemetry,
+    MemoryTelemetry,
+    GpuTelemetry,
+    StorageTelemetry,
+    BatteryTelemetry,
+    ThermalTelemetry,
+
+    PowerPlanControl,
+    GpuPreferenceControl,
+    ProcessPriorityControl,
+    MemoryOptimization,
+
+    FanSpeedRead,
+    FanSpeedControl,
+    FanCurveControl,
+
+    CpuFrequencyControl,
+    CpuVoltageControl,
+    GpuOverclocking,
+    GpuUndervolting,
+
+    BatteryChargeThreshold,
+    DellThermalControl,
+    DellBiosControl
+}
+
 /// <summary>
 /// Indicates whether a hardware capability is available on this system.
 /// Every hardware feature query returns one of these states rather than crashing.
@@ -194,6 +223,14 @@ public enum ImpactLevel
     High
 }
 
+public enum PriorityLevel
+{
+    Low,
+    Medium,
+    High,
+    Critical
+}
+
 /// <summary>Status of a game profile.</summary>
 public enum ProfileState
 {
@@ -229,4 +266,42 @@ public enum OptimizationStatus
     Failed,
     RolledBack,
     Unknown
+}
+
+/// <summary>Honest status of a hardware sensor reading.</summary>
+public enum SensorReadingState
+{
+    Available,
+    Unavailable,
+    Unsupported,
+    Error,
+    Stale
+}
+
+/// <summary>Hardware component category.</summary>
+public enum HardwareComponentType
+{
+    Cpu,
+    Gpu,
+    Memory,
+    Storage,
+    Motherboard,
+    Battery,
+    Fan,
+    Other
+}
+
+/// <summary>Telemetry sensor reading type.</summary>
+public enum TelemetrySensorType
+{
+    Temperature,
+    Clock,
+    Load,
+    Power,
+    Voltage,
+    Fan,
+    Data,
+    Factor,
+    Control,
+    Other
 }

@@ -29,6 +29,9 @@ public class GamePerformanceAnalyzer : IGamePerformanceAnalyzer
             PeakCpuUsage = session.PeakCpuUsage,
             PeakGpuUsage = session.PeakGpuUsage,
             PeakRamUsageBytes = (long)session.PeakRamUsageBytes,
+            AverageRamUsageBytes = (long)session.AverageRamUsageBytes,
+            PeakRamUsagePercent = session.PeakRamUsageBytes / (12.0 * 1024 * 1024 * 1024) * 100,
+            AverageRamUsagePercent = session.AverageRamUsageBytes / (12.0 * 1024 * 1024 * 1024) * 100,
             PeakTemperature = session.PeakTemperatureCelsius,
             Events = session.TimelineEvents
         };

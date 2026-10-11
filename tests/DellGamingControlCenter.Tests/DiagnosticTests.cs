@@ -24,15 +24,9 @@ namespace DellGamingControlCenter.Tests
             {
                 snaps.Add(new DiagnosticSnapshot
                 {
-                    CpuUtilization = cpu,
-                    CpuAvailability = MetricAvailability.Measured,
-                    GpuUtilization = gpu,
-                    GpuAvailability = MetricAvailability.Measured,
-                    TotalRamBytes = 8_000_000_000,
-                    UsedRamBytes = (long)(8_000_000_000 * ramPercent),
-                    RamAvailability = MetricAvailability.Measured,
-                    CpuTemperature = temp,
-                    ThermalAvailability = MetricAvailability.Measured
+                    CpuMetrics = new CpuMetrics { UsagePercent = cpu, TemperatureCelsius = temp },
+                    GpuMetrics = new GpuMetrics { UsagePercent = gpu, TemperatureCelsius = temp },
+                    RamMetrics = new RamMetrics { TotalBytes = 8_000_000_000, UsedBytes = (long)(8_000_000_000 * ramPercent) }
                 });
             }
             return snaps;
@@ -51,7 +45,7 @@ namespace DellGamingControlCenter.Tests
         {
             var analyzer = GetAnalyzer();
             var snaps = GenerateSnapshots(9, 30, 30); // 9 normal
-            snaps.Add(new DiagnosticSnapshot { CpuUtilization = 100, CpuAvailability = MetricAvailability.Measured, GpuUtilization = 100, GpuAvailability = MetricAvailability.Measured }); // 1 spike
+            snaps.Add(new DiagnosticSnapshot { CpuMetrics = new CpuMetrics { UsagePercent = 100 }, GpuMetrics = new GpuMetrics { UsagePercent = 100 } }); // 1 spike
             
             var results = analyzer.Analyze(snaps);
             Assert.Empty(results.Where(r => r.Type == BottleneckType.CPU || r.Type == BottleneckType.GPU));
@@ -140,9 +134,9 @@ namespace DellGamingControlCenter.Tests
             var recEngine = new RecommendationEngine();
             var profile = new GameProfile { ExecutablePath = "test.exe", PerformanceMode = PerformanceMode.Balanced, PreferredGpu = GpuPreference.Auto };
             
-            var bottlenecks = new List<BottleneckResult>
+            var bottlenecks = new List<DiagnosticFinding>
             {
-                new BottleneckResult { Type = BottleneckType.GPU, Severity = Severity.High }
+                new DiagnosticFinding { Category = DiagnosticCategory.GPU, Severity = DiagnosticSeverity.Critical, Title = "GPU Bottleneck" }
             };
 
             var recs = recEngine.GenerateRecommendations(bottlenecks, profile);

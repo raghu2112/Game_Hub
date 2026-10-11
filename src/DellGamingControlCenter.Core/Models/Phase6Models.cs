@@ -59,6 +59,8 @@ public sealed class SessionReport
     // RAM
     public long AverageRamUsageBytes { get; init; }
     public long PeakRamUsageBytes { get; init; }
+    public double AverageRamUsagePercent { get; init; }
+    public double PeakRamUsagePercent { get; init; }
     
     // Storage
     public double AverageDiskActiveTime { get; init; }

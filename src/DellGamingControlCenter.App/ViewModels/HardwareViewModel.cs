@@ -13,7 +13,7 @@ public class CapabilityItem
 
 public class HardwareViewModel : BaseViewModel
 {
-    private string _systemModel = "Dell Inspiron 3576";
+    private string _systemModel = ""; // populated from WMI at load; generic fallback — no vendor branding
     private string _cpuName = "Intel Core i3-7020U (2.30 GHz)";
     private string _gpu1Name = "Intel HD Graphics 620";
     private string _gpu2Name = "AMD Radeon 520 (2 GB)";
@@ -30,6 +30,7 @@ public class HardwareViewModel : BaseViewModel
     public string Storage2Info { get => _storage2Info; set => SetProperty(ref _storage2Info, value); }
 
     public ObservableCollection<CapabilityItem> Capabilities { get; } = new();
+    public ObservableCollection<HardwareSensorReading> SensorInventory { get; } = new();
 
     public HardwareViewModel()
     {
@@ -39,23 +40,66 @@ public class HardwareViewModel : BaseViewModel
 
     private void LoadHardwareDetails()
     {
-        var hw = App.HardwareDetector.GetSnapshot();
-        SystemModel = hw.System.Model;
+        var hw = App.HardwareProfileProvider.GetProfile();
+        SystemModel = $"{hw.Cpu.Manufacturer} Device";
         CpuName = hw.Cpu.Model;
-        // The hardware service currently gives basic info. 
-        // We format the detailed strings for the UI based on the prompt.
+        
+        if (hw.Gpus.Count > 0)
+        {
+            var integrated = hw.Gpus.FirstOrDefault(g => g.Type == Core.Enums.GpuType.Integrated);
+            if (integrated != null) Gpu1Name = integrated.Name;
+            
+            var discrete = hw.Gpus.FirstOrDefault(g => g.Type == Core.Enums.GpuType.Discrete);
+            if (discrete != null) Gpu2Name = discrete.Name;
+        }
+
+        MemoryInfo = $"{hw.Memory.TotalBytes / 1024 / 1024 / 1024} GB ({hw.Memory.SpeedMHz} MHz)";
+        
+        if (hw.Storage.Count > 0)
+        {
+            Storage1Info = $"{hw.Storage[0].Model} ({hw.Storage[0].Type})";
+            if (hw.Storage.Count > 1) Storage2Info = $"{hw.Storage[1].Model} ({hw.Storage[1].Type})";
+        }
+
+        SensorInventory.Clear();
+        var sensors = App.HardwareTelemetryProvider?.CaptureSnapshot()?.DiscoveredSensors;
+        if (sensors != null)
+        {
+            foreach (var sensor in sensors)
+            {
+                SensorInventory.Add(sensor);
+            }
+        }
     }
 
     private void LoadCapabilities()
     {
-        Capabilities.Add(new CapabilityItem { Name = "Windows Power Plans", IsSupported = true, Description = "Fully integrated with DellGamingControlCenter." });
-        Capabilities.Add(new CapabilityItem { Name = "Game Mode", IsSupported = true, Description = "Windows 10/11 Game Mode can be automated." });
-        Capabilities.Add(new CapabilityItem { Name = "GPU Preference", IsSupported = true, Description = "Direct3D GPU preference can be forced." });
-        Capabilities.Add(new CapabilityItem { Name = "Live Metrics", IsSupported = true, Description = "Standard WMI and Performance Counters supported." });
-        
-        Capabilities.Add(new CapabilityItem { Name = "Fan Control", IsSupported = false, Description = "This laptop does not expose a supported Dell interface for application-controlled fan curves." });
-        Capabilities.Add(new CapabilityItem { Name = "Undervolting", IsSupported = false, Description = "Intel XTU/Plundervolt mitigations block runtime undervolting on this CPU." });
-        Capabilities.Add(new CapabilityItem { Name = "Overclocking", IsSupported = false, Description = "Locked CPU multiplier and unsupported GPU BIOS." });
-        Capabilities.Add(new CapabilityItem { Name = "Battery Thresholds", IsSupported = false, Description = "Requires Dell Power Manager firmware support not present on this model." });
+        var profile = App.HardwareProfileProvider.GetProfile();
+        foreach (var kvp in profile.Capabilities)
+        {
+            var isSupported = kvp.Value == Core.Enums.CapabilityStatus.Supported || 
+                              kvp.Value == Core.Enums.CapabilityStatus.Limited || 
+                              kvp.Value == Core.Enums.CapabilityStatus.RequiresElevation;
+
+            string description = $"Status: {kvp.Value}";
+            if (!isSupported)
+            {
+                description = kvp.Key switch
+                {
+                    Core.Enums.HardwareCapability.FanSpeedControl => "Unsupported on this hardware.\nGamerHub could not detect a supported embedded-controller (EC) interface for fan-speed control on this system.",
+                    Core.Enums.HardwareCapability.DellThermalControl => "Unsupported on this hardware.\nNo hardware-level thermal modes are exposed by the system BIOS for this device.",
+                    Core.Enums.HardwareCapability.GpuOverclocking => "Unsupported on this hardware.\nThe GPU does not support user-defined voltage or frequency scaling.",
+                    Core.Enums.HardwareCapability.CpuVoltageControl => "Unsupported on this hardware.\nThis CPU has a locked voltage and frequency multiplier.",
+                    _ => $"Unsupported on this hardware.\nThe capability '{kvp.Key}' is not present or accessible on this system."
+                };
+            }
+
+            Capabilities.Add(new CapabilityItem 
+            { 
+                Name = kvp.Key.ToString(), 
+                IsSupported = isSupported,
+                Description = description
+            });
+        }
     }
 }

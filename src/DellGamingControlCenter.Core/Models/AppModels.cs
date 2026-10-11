@@ -20,6 +20,24 @@ public sealed class DellCapabilityReport
     public DateTime GeneratedAt { get; init; } = DateTime.UtcNow;
 }
 
+public sealed class ProcessInfo
+{
+    public int ProcessId { get; init; }
+    public string Name { get; init; } = "";
+    public long WorkingSetBytes { get; init; }
+    public ProcessPriorityClass Priority { get; init; }
+}
+
+public sealed class HardwareProfile
+{
+    public CpuInfo Cpu { get; init; } = new();
+    public List<GpuInfo> Gpus { get; init; } = [];
+    public RamInfo Memory { get; init; } = new();
+    public List<StorageDrive> Storage { get; init; } = [];
+    public BatteryInfo? Battery { get; init; }
+    public Dictionary<HardwareCapability, CapabilityStatus> Capabilities { get; init; } = new();
+}
+
 // ─── Windows Capability Report ──────────────────────────────────────────
 
 public sealed class WindowsCapabilityReport
@@ -52,7 +70,7 @@ public sealed class DiscoveredGame
 
 public sealed class GameProfile
 {
-    public string GameId { get; init; } = "";
+    public string GameId { get; set; } = "";
     public string GameName { get; init; } = "";
     public string ExecutablePath { get; init; } = "";
     public string InstallDirectory { get; init; } = "";
@@ -130,6 +148,22 @@ public sealed class OptimizationPlan
     public DateTime GeneratedAt { get; init; } = DateTime.UtcNow;
 }
 
+public sealed class PolicyResult
+{
+    public string PolicyName { get; init; } = "";
+    public string Status { get; init; } = ""; // Applied, Skipped, Failed
+    public string Reason { get; init; } = "";
+}
+
+public sealed class ProfileApplicationResult
+{
+    public bool Success { get; set; } = true;
+    public string ProfileId { get; set; } = "";
+    public List<PolicyResult> AppliedPolicies { get; init; } = [];
+    public List<PolicyResult> SkippedPolicies { get; init; } = [];
+    public List<PolicyResult> FailedPolicies { get; init; } = [];
+}
+
 public sealed class SessionSystemState
 {
     public string? PreviousPowerSchemeGuid { get; set; }
@@ -176,6 +210,24 @@ public sealed class GameSession
     public BaselineSnapshot? Baseline { get; set; }
     public List<PerformanceEvent> TimelineEvents { get; set; } = [];
     public SessionReport? Report { get; set; }
+
+    // Phase 8 Analytics
+    public double AverageCpuUsage { get; set; }
+    public double AverageRamUsageBytes { get; set; }
+    public double AverageGpuUsage { get; set; }
+    
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int CpuSampleCount { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public double TotalCpuUsage { get; set; }
+    
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int RamSampleCount { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public double TotalRamUsageBytes { get; set; }
+    
+    public List<DiagnosticFinding> SessionFindings { get; set; } = new();
+    public string GameStorageLocation { get; set; } = "";
 }
 
 // ─── Phase 3: Background & Memory ──────────────────────────────────────

@@ -23,6 +23,8 @@ public class MetricsSampler : IMetricsSampler
     
     private const int MaxHistory = 300; // Store up to 5 minutes at 1s intervals
 
+    public event EventHandler<DiagnosticSnapshot>? SnapshotCaptured;
+
     public MetricsSampler(ILoggingService logger, IDiagnosticEngine diagnosticEngine)
     {
         _logger = logger;
@@ -64,6 +66,22 @@ public class MetricsSampler : IMetricsSampler
                 {
                     var snapshot = await _diagnosticEngine.CaptureSnapshotAsync();
                     _buffer.Enqueue(snapshot);
+                    
+                    if (SnapshotCaptured != null)
+                    {
+                        foreach (Delegate handler in SnapshotCaptured.GetInvocationList())
+                        {
+                            try
+                            {
+                                var action = (EventHandler<DiagnosticSnapshot>)handler;
+                                action(this, snapshot);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Log($"Snapshot handler error: {ex.Message}", LogSeverity.Warning, "Sampler");
+                            }
+                        }
+                    }
                     
                     while (_buffer.Count > MaxHistory)
                     {

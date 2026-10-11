@@ -14,8 +14,8 @@ namespace DellGamingControlCenter.Tests
         public async Task LaunchGame_MissingExecutable_FailsSafely()
         {
             var logger = new LoggingService();
-            var engine = new OptimizationEngine(logger);
-            var launcher = new GameLauncher(logger, engine);
+            var evaluator = new Moq.Mock<DellGamingControlCenter.Core.Interfaces.IPolicyEvaluator>().Object;
+            var launcher = new GameLauncher(logger, evaluator);
             
             var profile = new GameProfile
             {
@@ -34,8 +34,8 @@ namespace DellGamingControlCenter.Tests
         public async Task FindProcess_TimesOut_ReturnsNull()
         {
             var logger = new LoggingService();
-            var engine = new OptimizationEngine(logger);
-            var launcher = new GameLauncher(logger, engine);
+            var evaluator = new Moq.Mock<DellGamingControlCenter.Core.Interfaces.IPolicyEvaluator>().Object;
+            var launcher = new GameLauncher(logger, evaluator);
             
             var session = new GameSession
             {

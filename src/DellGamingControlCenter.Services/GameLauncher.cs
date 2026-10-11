@@ -12,12 +12,12 @@ using DellGamingControlCenter.Core.Models;
 public class GameLauncher : IGameLauncher
 {
     private readonly ILoggingService _logger;
-    private readonly IOptimizationEngine _optimizationEngine;
+    private readonly IPolicyEvaluator _policyEvaluator;
 
-    public GameLauncher(ILoggingService logger, IOptimizationEngine optimizationEngine)
+    public GameLauncher(ILoggingService logger, IPolicyEvaluator policyEvaluator)
     {
         _logger = logger;
-        _optimizationEngine = optimizationEngine;
+        _policyEvaluator = policyEvaluator;
     }
 
     public async Task<GameSession> LaunchGameAsync(GameProfile profile, CancellationToken cancellationToken)
@@ -40,22 +40,19 @@ public class GameLauncher : IGameLauncher
             return session;
         }
 
-        // Generate Plan
-        var plan = _optimizationEngine.GeneratePlan(profile);
-        session.OptimizationSessionId = plan.PlanId;
-
-        // Apply pre-launch optimizations
+        // Apply pre-launch policies (GPU Preference, Power Mode)
         session.CurrentState = GameSessionState.Optimizing;
-        bool optSuccess = await _optimizationEngine.ApplyPlanAsync(plan);
-        session.OptimizationSuccessful = optSuccess;
-        
-        // Populate applied changes for rollback tracing
-        session.AppliedChanges = plan.Actions;
+        var preLaunchResult = await _policyEvaluator.ApplyPreLaunchPoliciesAsync(profile, session);
+        session.OptimizationSuccessful = preLaunchResult.Success;
 
-        if (!optSuccess)
+        foreach (var policy in preLaunchResult.AppliedPolicies)
         {
-            _logger.Log("Some optimizations failed. Proceeding with launch anyway as per safety rules.", LogSeverity.Warning, "Launcher");
-            // The optimization engine handles rollback for failed strict items, but we can still launch.
+            session.AppliedChanges.Add(new OptimizationAction { Description = policy.PolicyName, Value = policy.Status });
+        }
+
+        if (!preLaunchResult.Success)
+        {
+            _logger.Log("Some pre-launch policies failed. Proceeding with launch anyway as per safety rules.", LogSeverity.Warning, "Launcher");
         }
 
         if (cancellationToken.IsCancellationRequested)
@@ -72,7 +69,7 @@ public class GameLauncher : IGameLauncher
             {
                 FileName = profile.ExecutablePath,
                 WorkingDirectory = profile.WorkingDirectory ?? Path.GetDirectoryName(profile.ExecutablePath),
-                UseShellExecute = true
+                UseShellExecute = false
             };
             
             if (!string.IsNullOrEmpty(profile.LaunchArguments))
@@ -141,46 +138,4 @@ public class GameLauncher : IGameLauncher
         return null;
     }
 
-    public async Task<bool> ApplyRuntimeOptimizationsAsync(GameSession session, int processId)
-    {
-        return await Task.Run(() =>
-        {
-            try
-            {
-                var process = Process.GetProcessById(processId);
-                
-                // Find priority action
-                var priorityAction = session.AppliedChanges.Find(a => a.Type == "ProcessPriority");
-                if (priorityAction != null && priorityAction.Status == OptimizationStatus.Applied)
-                {
-                    if (Enum.TryParse<Core.Enums.ProcessPriorityClass>(priorityAction.Value, out var targetPriority))
-                    {
-                        // Backup original
-                        session.OriginalSystemState.PreviousProcessPriorities[processId] = (Core.Enums.ProcessPriorityClass)(int)process.PriorityClass;
-                        priorityAction.RevertValue = process.PriorityClass.ToString();
-                        
-                        _logger.Log($"Applying runtime priority {targetPriority} to PID {processId}", LogSeverity.Info, "Launcher");
-                        process.PriorityClass = (System.Diagnostics.ProcessPriorityClass)(int)targetPriority;
-                        
-                        // Verify
-                        if (process.PriorityClass == (System.Diagnostics.ProcessPriorityClass)(int)targetPriority)
-                        {
-                            priorityAction.Status = OptimizationStatus.Verified;
-                        }
-                        else
-                        {
-                            priorityAction.Status = OptimizationStatus.Failed;
-                            _logger.Log("Priority application failed verification.", LogSeverity.Warning, "Launcher");
-                        }
-                    }
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.Log($"Failed to apply runtime optimization to PID {processId}: {ex.Message} (Requires elevation?)", LogSeverity.Warning, "Launcher");
-                return false;
-            }
-        });
-    }
 }

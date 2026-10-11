@@ -11,7 +11,8 @@ namespace DellGamingControlCenter.Tests
         public async Task ChangePerformanceMode_UpdatesState()
         {
             var logger = new LoggingService();
-            var perfService = new PerformanceModeService(logger);
+            var mockPowerPlan = new Moq.Mock<DellGamingControlCenter.Core.Interfaces.IWindowsPowerPlanService>();
+            var perfService = new PerformanceModeService(logger, mockPowerPlan.Object);
             
             // This test modifies system state during execution, so we must be careful.
             // On a real system we would mock the powercfg calls. For this architecture,

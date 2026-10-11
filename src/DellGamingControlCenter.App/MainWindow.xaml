@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewmodels="clr-namespace:DellGamingControlCenter.App.ViewModels"
         xmlns:views="clr-namespace:DellGamingControlCenter.App.Views"
-        Title="Dell Gaming &amp; Performance Control Center" 
-        Height="750" Width="1200" MinHeight="650" MinWidth="1000"
+        Title="GamerHub" 
+        Height="760" Width="1280" MinHeight="680" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource AppBackgroundPrimary}">
+        Background="{StaticResource AppBackgroundBrush}">
     
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
@@ -37,44 +37,220 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="74"/>    <!-- Left nav rail -->
+            <ColumnDefinition Width="*"/>     <!-- Main content -->
         </Grid.ColumnDefinitions>
 
-        <!-- Left Navigation -->
-        <Border Grid.Column="0" Background="{StaticResource AppBackgroundSecondary}" BorderBrush="{StaticResource AppBorder}" BorderThickness="0,0,1,0">
+        <!-- ══════════ LEFT NAVIGATION RAIL ══════════ (spec §4.1) -->
+        <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource AppBorder}" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>   <!-- Logo area -->
+                    <RowDefinition Height="*"/>      <!-- Nav items -->
+                    <RowDefinition Height="Auto"/>   <!-- Status area -->
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <StackPanel Grid.Row="0" Margin="20,30,20,40">
-                    <TextBlock Text="DGC" FontFamily="{StaticResource PrimaryFont}" FontSize="32" FontWeight="Black" Foreground="{StaticResource AppAccent}"/>
-                    <TextBlock Text="D E L L   G A M I N G   C E N T E R" FontFamily="{StaticResource PrimaryFont}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AppTextSecondary}" Margin="0,5,0,0" />
+                <!-- GamerHub logo/identity -->
+                <StackPanel Grid.Row="0" Margin="0,18,0,12" HorizontalAlignment="Center">
+                    <Border Width="40" Height="40" CornerRadius="3"
+                            Background="{StaticResource RaisedSurfaceBrush}"
+                            BorderBrush="{StaticResource AppBorder}" BorderThickness="1">
+                        <TextBlock Text="GH" FontFamily="{StaticResource MonoFont}" FontSize="15"
+                                   FontWeight="Bold" Foreground="{StaticResource PrimaryAccentBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
                 </StackPanel>
 
-                <!-- Nav Buttons -->
-                <StackPanel Grid.Row="1">
-                    <Button Content="Dashboard" Command="{Binding NavigateDashboardCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Game Center" Command="{Binding NavigateGameCenterCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Performance" Command="{Binding NavigatePerformanceCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Diagnostics" Command="{Binding NavigateDiagnosticsCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Sessions" Command="{Binding NavigateSessionsCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Hardware" Command="{Binding NavigateHardwareCommand}" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="Benchmarks" Command="{Binding NavigateBenchmarksCommand}" Style="{StaticResource NavButtonStyle}"/>
+                <!-- Navigation items -->
+                <StackPanel Grid.Row="1" Margin="0,4,0,0">
+                    <!-- Dashboard/Home -->
+                    <Button Command="{Binding NavigateDashboardCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsDashboardActive}"
+                            AutomationProperties.Name="Dashboard"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="HOME" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Game Center -->
+                    <Button Command="{Binding NavigateGameCenterCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsGameCenterActive}"
+                            AutomationProperties.Name="Game Center"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE7FC;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="GAMES" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Performance -->
+                    <Button Command="{Binding NavigatePerformanceCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsPerformanceActive}"
+                            AutomationProperties.Name="Performance"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE9ED;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="PERF" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Diagnostics -->
+                    <Button Command="{Binding NavigateDiagnosticsCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsDiagnosticsActive}"
+                            AutomationProperties.Name="Diagnostics"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE71D;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="DIAG" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Sessions -->
+                    <Button Command="{Binding NavigateSessionsCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsSessionsActive}"
+                            AutomationProperties.Name="Sessions"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE818;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="SESSIONS" FontFamily="{StaticResource PrimaryFont}" FontSize="8.5" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Hardware -->
+                    <Button Command="{Binding NavigateHardwareCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsHardwareActive}"
+                            AutomationProperties.Name="Hardware"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE912;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="HW" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Benchmarks -->
+                    <Button Command="{Binding NavigateBenchmarksCommand}"
+                            Style="{StaticResource ClayNavButton}"
+                            Tag="{Binding IsBenchmarksActive}"
+                            AutomationProperties.Name="Benchmarks"
+                            Margin="6,3" HorizontalContentAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            <TextBlock Text="BENCH" FontFamily="{StaticResource PrimaryFont}" FontSize="9" FontWeight="SemiBold"
+                                       Margin="0,3,0,0" HorizontalAlignment="Center"
+                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-                
-                <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                    <Button Content="Settings" Command="{Binding NavigateSettingsCommand}" Style="{StaticResource NavButtonStyle}" Margin="10,0"/>
-                    <TextBlock Text="{Binding Version}" Foreground="{StaticResource AppTextSecondary}" FontSize="11" Margin="20,10,20,0" HorizontalAlignment="Center"/>
+
+                <!-- Bottom status area -->
+                <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                    <!-- Version indicator -->
+                    <Border Background="{StaticResource InsetSurfaceBrush}" CornerRadius="6" Padding="6,3" HorizontalAlignment="Center"
+                            BorderBrush="{StaticResource ClayInsetBorderBrush}" BorderThickness="1">
+                        <TextBlock Text="{Binding Version}" FontFamily="{StaticResource MonoFont}" FontSize="9"
+                                   Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center"/>
+                    </Border>
+                    <!-- Settings icon at bottom -->
+                    <Button Command="{Binding NavigateSettingsCommand}" Style="{StaticResource ClayIconButton}"
+                            Tag="{Binding IsSettingsActive}" ToolTip="Settings"
+                            AutomationProperties.Name="Settings"
+                            Margin="0,8,0,0" HorizontalAlignment="Center">
+                        <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="15"
+                                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                   VerticalAlignment="Center"/>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Content Area -->
-        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="0" />
+        <!-- ══════════ MAIN CONTENT AREA ══════════ (spec §4.2) -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- Header bar -->
+                <RowDefinition Height="*"/>      <!-- Page content -->
+            </Grid.RowDefinitions>
+
+            <!-- Top header bar -->
+            <Border Grid.Row="0" Background="{StaticResource AppBackgroundBrush}"
+                    BorderBrush="{StaticResource AppBorder}" BorderThickness="0,0,0,1"
+                    Padding="24,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>   <!-- Title + description -->
+                        <ColumnDefinition Width="Auto"/> <!-- Utilities -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Page title area: brand + global search -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
+                        <!-- Brand wordmark (QA + identity marker, spec §4.1) -->
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                            <TextBlock Text="GAMERHUB" FontFamily="{StaticResource HeaderFont}" FontSize="16"
+                                       FontWeight="Black" Foreground="{StaticResource TextPrimaryBrush}"
+                                       AutomationProperties.Name="GAMERHUB"/>
+                            <TextBlock Text="PC GAMING CONTROL CENTER" FontSize="8" FontWeight="Bold"
+                                       Foreground="{StaticResource TextMutedBrush}" Margin="0,1,0,0"/>
+                        </StackPanel>
+                        <!-- Global search -->
+                        <Border Background="{StaticResource InsetSurfaceBrush}" BorderBrush="{StaticResource AppBorder}"
+                                BorderThickness="1" CornerRadius="8" Width="260" Height="36">
+                            <Grid>
+                                <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="12" Foreground="{StaticResource TextMutedBrush}"
+                                           VerticalAlignment="Center" Margin="12,0,0,0" IsHitTestVisible="False"/>
+                                <TextBox x:Name="GlobalSearch" BorderThickness="0" Background="Transparent"
+                                         Padding="8,0,10,0" VerticalContentAlignment="Center" FontSize="12"
+                                         Foreground="{StaticResource TextPrimaryBrush}"
+                                         CaretBrush="{StaticResource SecondaryAccentBrush}"
+                                         VerticalAlignment="Center"
+                                         TextChanged="GlobalSearch_TextChanged"
+                                         ToolTip="Search your game library"
+                                         AutomationProperties.Name="Global Search"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Right utilities -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Live status indicator -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding GlobalStatus}" FontFamily="{StaticResource PrimaryFont}"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Page content host -->
+            <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="28"/>
+        </Grid>
     </Grid>
 </Window>

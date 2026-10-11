@@ -27,17 +27,17 @@ public class BottleneckAnalyzer : IBottleneckAnalyzer
             return results;
         }
 
-        double avgCpu = snaps.Average(s => s.CpuUtilization);
-        double avgGpu = snaps.Average(s => s.GpuUtilization);
+        double avgCpu = snaps.Average(s => s.CpuMetrics.UsagePercent);
+        double avgGpu = snaps.Average(s => s.GpuMetrics.UsagePercent ?? 0);
         
         // Ensure availability
-        bool cpuAvailable = snaps.Any(s => s.CpuAvailability == MetricAvailability.Measured);
-        bool gpuAvailable = snaps.Any(s => s.GpuAvailability == MetricAvailability.Measured);
+        bool cpuAvailable = true;
+        bool gpuAvailable = snaps.Any(s => s.GpuMetrics.UsagePercent.HasValue);
 
         // 1. GPU Bottleneck (High confidence if GPU > 95% and CPU < 85%)
         if (gpuAvailable)
         {
-            int sustainedGpuCount = snaps.Count(s => s.GpuUtilization > 95);
+            int sustainedGpuCount = snaps.Count(s => s.GpuMetrics.UsagePercent > 95);
             if (sustainedGpuCount > snaps.Count * 0.7) // 70% of time
             {
                 results.Add(new BottleneckResult
@@ -55,7 +55,7 @@ public class BottleneckAnalyzer : IBottleneckAnalyzer
         // 2. CPU Bottleneck
         if (cpuAvailable)
         {
-            int sustainedCpuCount = snaps.Count(s => s.CpuUtilization > 90);
+            int sustainedCpuCount = snaps.Count(s => s.CpuMetrics.UsagePercent > 90);
             if (sustainedCpuCount > snaps.Count * 0.7)
             {
                 results.Add(new BottleneckResult
@@ -71,10 +71,10 @@ public class BottleneckAnalyzer : IBottleneckAnalyzer
         }
 
         // 3. RAM Pressure
-        bool ramAvailable = snaps.Any(s => s.RamAvailability == MetricAvailability.Measured);
+        bool ramAvailable = true;
         if (ramAvailable)
         {
-            double avgRamUsedPercent = snaps.Average(s => (double)s.UsedRamBytes / s.TotalRamBytes);
+            double avgRamUsedPercent = snaps.Average(s => s.RamMetrics.TotalBytes > 0 ? (double)s.RamMetrics.UsedBytes / s.RamMetrics.TotalBytes : 0);
             if (avgRamUsedPercent > 0.85)
             {
                 results.Add(new BottleneckResult
@@ -90,10 +90,10 @@ public class BottleneckAnalyzer : IBottleneckAnalyzer
         }
         
         // 4. Thermals
-        bool tempAvailable = snaps.Any(s => s.ThermalAvailability == MetricAvailability.Measured);
+        bool tempAvailable = snaps.Any(s => s.CpuMetrics.TemperatureCelsius.HasValue);
         if (tempAvailable)
         {
-            double avgTemp = snaps.Average(s => s.CpuTemperature);
+            double avgTemp = snaps.Average(s => s.CpuMetrics.TemperatureCelsius ?? 0);
             if (avgTemp > 85)
             {
                 results.Add(new BottleneckResult

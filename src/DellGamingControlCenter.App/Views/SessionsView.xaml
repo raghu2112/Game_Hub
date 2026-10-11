@@ -2,80 +2,127 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="Transparent">
-    <Grid Margin="30">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <!-- Header -->
-        <TextBlock Grid.Row="0" Text="Session History" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,20"/>
 
-        <!-- Main Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <!-- ═══════════ HEADER (spec §9) ═══════════ -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="GAMING ACTIVITY" Style="{StaticResource SubheaderStyle}"/>
+            <TextBlock Text="Session History" Style="{StaticResource PageTitleStyle}" Margin="0,4,0,4"/>
+            <TextBlock Text="Timeline of recorded sessions from config.json. Only real recorded metrics are shown."
+                       Style="{StaticResource BodyTextStyle}" Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        
-                        <!-- Table Header -->
-                        <Grid Grid.Row="0" Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1.5*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <TextBlock Grid.Column="0" Text="GAME" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="1" Text="DATE" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="2" Text="DURATION" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="3" Text="HEALTH" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="4" Text="BOTTLENECK" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="5" Text="OPTIMIZATION" Style="{StaticResource SubheaderTextStyle}"/>
-                            <TextBlock Grid.Column="6" Text="RESTORATION" Style="{StaticResource SubheaderTextStyle}"/>
-                        </Grid>
-                        
-                        <!-- Table Body -->
-                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Sessions}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="{StaticResource AppBorder}" BorderThickness="0,1,0,0" Padding="0,15">
+                <ItemsControl ItemsSource="{Binding Sessions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource ClayCard}" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <!-- Top row: game + actions -->
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Game}" FontSize="17" FontWeight="Bold"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Date}" FontSize="11.5"
+                                                       Foreground="{StaticResource TextMutedBrush}" Margin="0,3,0,0"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="1" Content="VIEW REPORT"
+                                                Command="{Binding DataContext.ViewReportCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource SecondaryButtonStyle}" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <!-- Stat strip (recessed readout, spec §3.3) -->
+                                    <Border Style="{StaticResource ClayInset}" Padding="14,10" Margin="0,0,0,12">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1.5*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="1.4*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            
-                                            <TextBlock Grid.Column="0" Text="{Binding Game}" Foreground="{StaticResource AppTextPrimary}" FontWeight="Bold"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Date}" Foreground="{StaticResource AppTextSecondary}"/>
-                                            <TextBlock Grid.Column="2" Text="{Binding Duration}" Foreground="{StaticResource AppTextSecondary}"/>
-                                            <TextBlock Grid.Column="3" Text="{Binding Health}" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold"/>
-                                            <TextBlock Grid.Column="4" Text="{Binding PrimaryBottleneck}" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold"/>
-                                            <TextBlock Grid.Column="5" Text="{Binding Optimization}" Foreground="{StaticResource AppTextSecondary}"/>
-                                            <TextBlock Grid.Column="6" Text="{Binding Restoration}" Foreground="{StaticResource AppTextSecondary}"/>
-                                            
-                                            <Button Grid.Column="7" Content="VIEW REPORT" Command="{Binding DataContext.ViewReportCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" Style="{StaticResource SecondaryButtonStyle}" Padding="15,5"/>
+
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="DURATION" Style="{StaticResource TelemetryLabelStyle}"/>
+                                                <TextBlock Text="{Binding Duration}" FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                                           FontFamily="{StaticResource MonoFont}" Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="HEALTH" Style="{StaticResource TelemetryLabelStyle}"/>
+                                                <TextBlock Text="{Binding Health}" FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource SuccessBrush}" Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2">
+                                                <TextBlock Text="BOTTLENECK" Style="{StaticResource TelemetryLabelStyle}"/>
+                                                <TextBlock Text="{Binding PrimaryBottleneck}" FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource WarningBrush}"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="3">
+                                                <TextBlock Text="OPTIMIZATION" Style="{StaticResource TelemetryLabelStyle}"/>
+                                                <TextBlock Text="{Binding Optimization}" FontSize="13"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="4">
+                                                <TextBlock Text="RESTORATION" Style="{StaticResource TelemetryLabelStyle}"/>
+                                                <TextBlock Text="{Binding Restoration}" FontSize="13"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
-                </Border>
+
+                                    <!-- Session insights -->
+                                    <ItemsControl ItemsSource="{Binding SessionInsights}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{StaticResource AppAccentDim}" CornerRadius="8"
+                                                        Padding="12,8" Margin="0,0,0,6">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Title, StringFormat='Insight: {0}'}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                                   FontSize="12" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding Evidence}"
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   FontSize="11" FontStyle="Italic" Margin="0,3,0,0"
+                                                                   TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Empty / recoverable state (spec §9) -->
+                <StackPanel Style="{StaticResource EmptyStateStyle}"
+                            Visibility="{Binding Sessions.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                    <TextBlock Text="No completed gaming sessions yet." FontSize="16" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Your session history appears here after your first game session."
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"
+                               HorizontalAlignment="Center" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>

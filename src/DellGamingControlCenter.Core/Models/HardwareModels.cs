@@ -22,13 +22,24 @@ public sealed class CpuInfo
 
 public sealed class CpuMetrics
 {
-    public double UsagePercent { get; init; }
+    public double UsagePercent { get; set; }
     public double CurrentClockMHz { get; init; }
     public double? TemperatureCelsius { get; init; }
     public double? PackagePowerWatts { get; init; }
+    public double? CoreVoltageVolts { get; init; }
     public bool? IsThermalThrottling { get; init; }
     public double[] PerCoreUsage { get; init; } = [];
-    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+    public double[] PerCoreClocksMHz { get; init; } = [];
+    public double[] PerCoreTemperaturesCelsius { get; init; } = [];
+    public SensorReadingState TemperatureState { get; init; } = SensorReadingState.Unavailable;
+    public string? TemperatureDiagnosticReason { get; init; }
+    public SensorReadingState ClockState { get; init; } = SensorReadingState.Unavailable;
+    public string? ClockDiagnosticReason { get; init; }
+    public SensorReadingState PowerState { get; init; } = SensorReadingState.Unavailable;
+    public string? PowerDiagnosticReason { get; init; }
+    public SensorReadingState VoltageState { get; init; } = SensorReadingState.Unavailable;
+    public string? VoltageDiagnosticReason { get; init; }
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }
 
 // ─── GPU ────────────────────────────────────────────────────────────────
@@ -57,6 +68,16 @@ public sealed class GpuMetrics
     public double? MemoryClockMHz { get; init; }
     public double? PowerWatts { get; init; }
     public long? VramUsedBytes { get; init; }
+    public long? VramAvailableBytes { get; init; }
+    public long? VramTotalBytes { get; init; }
+    public long? SharedMemoryUsedBytes { get; init; }
+    public long? SharedMemoryAvailableBytes { get; init; }
+    public long? SharedMemoryTotalBytes { get; init; }
+    public int? FanRpm { get; init; }
+    public SensorReadingState TemperatureState { get; init; } = SensorReadingState.Unavailable;
+    public string? TemperatureDiagnosticReason { get; init; }
+    public SensorReadingState MemoryState { get; init; } = SensorReadingState.Unavailable;
+    public string? MemoryDiagnosticReason { get; init; }
     public DateTime Timestamp { get; init; } = DateTime.UtcNow;
 }
 
@@ -164,11 +185,16 @@ public sealed class ThermalMetrics
     public double? CpuTemperature { get; init; }
     public double? GpuTemperature { get; init; }
     public double? SsdTemperature { get; init; }
+    public double? AmbientTemperature { get; init; }
     public int? FanRpm { get; init; }
     public ThermalState CpuThermalState { get; init; } = ThermalState.Unknown;
     public ThermalState GpuThermalState { get; init; } = ThermalState.Unknown;
     public bool? IsCpuThrottling { get; init; }
     public bool? IsGpuThrottling { get; init; }
+    public SensorReadingState CpuTemperatureState { get; init; } = SensorReadingState.Unavailable;
+    public SensorReadingState GpuTemperatureState { get; init; } = SensorReadingState.Unavailable;
+    public SensorReadingState FanRpmState { get; init; } = SensorReadingState.Unavailable;
+    public string? DiagnosticReason { get; init; }
     public DateTime Timestamp { get; init; } = DateTime.UtcNow;
 }
 
@@ -196,4 +222,35 @@ public sealed class HardwareSnapshot
     public BatteryInfo? Battery { get; init; }
     public List<NetworkAdapterInfo> NetworkAdapters { get; init; } = [];
     public DateTime DetectedAt { get; init; } = DateTime.UtcNow;
+}
+
+// ─── Universal Hardware Sensor Telemetry ────────────────────────────────
+
+public sealed class HardwareSensorReading
+{
+    public string SensorId { get; init; } = "";
+    public string HardwareName { get; init; } = "";
+    public HardwareComponentType ComponentType { get; init; } = HardwareComponentType.Other;
+    public TelemetrySensorType SensorType { get; init; } = TelemetrySensorType.Other;
+    public string SensorName { get; init; } = "";
+    public double? Value { get; init; }
+    public double? MinValue { get; init; }
+    public double? MaxValue { get; init; }
+    public string Unit { get; init; } = "";
+    public SensorReadingState State { get; init; } = SensorReadingState.Unavailable;
+    public string? DiagnosticReason { get; init; }
+    public string SourceProvider { get; init; } = "";
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+}
+
+public sealed class HardwareTelemetrySnapshot
+{
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+    public string ActiveProvider { get; init; } = "";
+    public List<HardwareSensorReading> DiscoveredSensors { get; init; } = [];
+    public CpuMetrics CpuMetrics { get; init; } = new();
+    public RamMetrics RamMetrics { get; init; } = new();
+    public GpuMetrics DiscreteGpuMetrics { get; init; } = new();
+    public GpuMetrics IntegratedGpuMetrics { get; init; } = new();
+    public ThermalMetrics ThermalMetrics { get; init; } = new();
 }

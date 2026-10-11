@@ -10,18 +10,15 @@ public class SmartOptimizer : ISmartOptimizer
     private readonly IDiagnosticEngine _diagnosticEngine;
     private readonly IRecommendationEngine _recommendationEngine;
     private readonly IMetricsSampler _sampler;
-    private readonly IOptimizationEngine _baseOptimizationEngine;
 
     public SmartOptimizer(
         IDiagnosticEngine diagnosticEngine, 
         IRecommendationEngine recommendationEngine, 
-        IMetricsSampler sampler,
-        IOptimizationEngine baseOptimizationEngine)
+        IMetricsSampler sampler)
     {
         _diagnosticEngine = diagnosticEngine;
         _recommendationEngine = recommendationEngine;
         _sampler = sampler;
-        _baseOptimizationEngine = baseOptimizationEngine;
     }
 
     public async Task<OptimizationPlan> GenerateSmartPlanAsync(GameProfile profile)
@@ -36,11 +33,24 @@ public class SmartOptimizer : ISmartOptimizer
             history.Add(snapshot);
         }
 
-        var bottlenecks = await _diagnosticEngine.RunDiagnosticAnalysisAsync(history);
-        var recommendations = _recommendationEngine.GenerateRecommendations(bottlenecks, profile);
+        var report = await _diagnosticEngine.RunDiagnosticAnalysisAsync(history);
+        var recommendations = _recommendationEngine.GenerateRecommendations(report.Findings, profile);
 
         // Map recommendations to actual optimization plan actions
-        var basePlan = _baseOptimizationEngine.GeneratePlan(profile);
+        var basePlan = new OptimizationPlan
+        {
+            GameId = profile.GameId,
+            GameName = profile.GameName
+        };
+
+        if (profile.PreferredGpu != Core.Enums.GpuPreference.Auto)
+        {
+            basePlan.Actions.Add(new OptimizationAction { Type = "GpuPreference", Target = profile.ExecutablePath, Value = profile.PreferredGpu.ToString() });
+        }
+        if (profile.ProcessPriority != Core.Enums.ProcessPriorityClass.Normal)
+        {
+            basePlan.Actions.Add(new OptimizationAction { Type = "ProcessPriority", Target = profile.ExecutablePath, Value = profile.ProcessPriority.ToString() });
+        }
 
         foreach (var rec in recommendations)
         {

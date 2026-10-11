@@ -2,79 +2,116 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="Transparent">
-    <Grid Margin="30">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <!-- Header -->
-        <TextBlock Grid.Row="0" Text="Hardware Specifications" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,20"/>
 
-        <!-- Main Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
-                            <StackPanel>
-                                <TextBlock Text="SYSTEM" Style="{StaticResource SubheaderTextStyle}"/>
-                                <TextBlock Text="{Binding SystemModel}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,20"/>
-                                
-                                <TextBlock Text="CPU" Style="{StaticResource SubheaderTextStyle}"/>
-                                <TextBlock Text="{Binding CpuName}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,20"/>
-                                
-                                <TextBlock Text="GPU" Style="{StaticResource SubheaderTextStyle}"/>
-                                <TextBlock Text="{Binding Gpu1Name}" FontSize="16" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,0"/>
-                                <TextBlock Text="{Binding Gpu2Name}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,20"/>
-                                
-                                <TextBlock Text="MEMORY" Style="{StaticResource SubheaderTextStyle}"/>
-                                <TextBlock Text="{Binding MemoryInfo}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,20"/>
-                                
-                                <TextBlock Text="STORAGE" Style="{StaticResource SubheaderTextStyle}"/>
-                                <TextBlock Text="{Binding Storage1Info}" FontSize="16" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,0"/>
-                                <TextBlock Text="{Binding Storage2Info}" FontSize="16" Foreground="{StaticResource AppTextPrimary}" Margin="0,5,0,20"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="1">
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel>
-                                <TextBlock Text="CAPABILITIES" Style="{StaticResource SubheaderTextStyle}" Margin="0,0,0,15"/>
-                                
-                                <ItemsControl ItemsSource="{Binding Capabilities}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="0,0,0,15" Padding="0,0,0,15" BorderBrush="{StaticResource AppBorder}" BorderThickness="0,0,0,1">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="30"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    
-                                                    <TextBlock Grid.Column="0" Text="✓" Foreground="{StaticResource SuccessBrush}" FontWeight="Bold" FontSize="18" Visibility="{Binding IsSupported, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                                    <TextBlock Grid.Column="0" Text="✕" Foreground="{StaticResource ErrorBrush}" FontWeight="Bold" FontSize="18" Visibility="{Binding IsSupported, Converter={StaticResource InverseBooleanConverter}}"/>
-                                                    
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource AppTextPrimary}"/>
-                                                        <TextBlock Text="{Binding Description}" Foreground="{StaticResource AppTextSecondary}" TextWrapping="Wrap" Margin="0,5,0,0" Visibility="{Binding IsSupported, Converter={StaticResource InverseBooleanConverter}}"/>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+        <!-- ═══════════ HEADER ═══════════ -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="SYSTEM SPECIFICATIONS" Style="{StaticResource SubheaderStyle}"/>
+            <TextBlock Text="Hardware" Style="{StaticResource PageTitleStyle}" Margin="0,4,0,4"/>
+            <TextBlock Text="Detected components and per-capability support reported by the capability detector."
+                       Style="{StaticResource BodyTextStyle}" Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- System -->
+                <StackPanel Grid.Column="0">
+                    <Border Style="{StaticResource ClayCard}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="SYSTEM" Style="{StaticResource SubheaderStyle}" Margin="0,0,0,8"/>
+                            <TextBlock Text="{Binding SystemModel}" FontSize="22" FontWeight="Bold"
+                                       Foreground="{StaticResource SecondaryAccentBrush}"
+                                       Margin="0,4,0,20" TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Text="PROCESSOR" Style="{StaticResource TelemetryLabelStyle}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding CpuName}" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16"
+                                       TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Text="GRAPHICS" Style="{StaticResource TelemetryLabelStyle}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding Gpu1Name}" FontSize="13"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,0,2" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Gpu2Name}" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16"
+                                       TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Text="MEMORY" Style="{StaticResource TelemetryLabelStyle}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding MemoryInfo}" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16"
+                                       TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Text="STORAGE" Style="{StaticResource TelemetryLabelStyle}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding Storage1Info}" FontSize="13.5"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       Margin="0,0,0,3" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Storage2Info}" FontSize="13.5"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Capabilities -->
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource ClayCard}">
+                        <StackPanel>
+                            <TextBlock Text="CAPABILITIES" Style="{StaticResource SubheaderStyle}" Margin="0,0,0,14"/>
+                            <ItemsControl ItemsSource="{Binding Capabilities}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource CapabilityTile}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="26"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Status mark: glyph + text, not colour alone -->
+                                                <TextBlock Grid.Column="0" FontSize="15" FontWeight="Bold"
+                                                           VerticalAlignment="Top">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="✓"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSupported}" Value="False">
+                                                                    <Setter Property="Text" Value="✕"/>
+                                                                    <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="{Binding Description}"
+                                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                                               FontSize="11.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>

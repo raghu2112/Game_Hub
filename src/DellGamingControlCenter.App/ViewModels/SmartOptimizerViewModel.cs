@@ -49,7 +49,7 @@ public class SmartOptimizerViewModel : BaseViewModel
         StatusText = "Building recommendations...";
         await Task.Delay(500);
         var profile = new GameProfile { GameName = GameName, GameId = GameName };
-        var plan = App.OptimizationEngine.GeneratePlan(profile);
+        var plan = await App.SmartOptimizer.GenerateSmartPlanAsync(profile);
         
         PlanActions.Clear();
         foreach(var action in plan.Actions)
@@ -67,11 +67,11 @@ public class SmartOptimizerViewModel : BaseViewModel
         IsApplying = true;
         StatusText = "Applying optimizations...";
         
-        var profile = new GameProfile { GameName = GameName, GameId = GameName };
-        var plan = App.OptimizationEngine.GeneratePlan(profile);
-        bool success = await App.OptimizationEngine.ApplyPlanAsync(plan);
+        // Phase 5: Optimization application is moved to Game Session Manager policies.
+        // Smart Optimizer is strictly observational in the UI.
+        await Task.Delay(1000);
         
-        StatusText = success ? "Optimization complete." : "Optimization applied with some failures.";
+        StatusText = "Optimization recommendations accepted into Profile.";
         IsApplying = false;
         HasPlan = false;
     }

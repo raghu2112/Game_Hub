@@ -14,11 +14,26 @@ namespace DellGamingControlCenter.App
 
         private void SetupTrayIcon()
         {
+            // S3: use the real GamerHub icon; fall back to the generic one only if
+            // the embedded resource can't be extracted.
+            var trayIcon = System.Drawing.SystemIcons.Application;
+            try
+            {
+                // IL3000: Assembly.Location is empty in single-file apps; use AppContext.BaseDirectory for the EXE path.
+                var exePath = System.IO.Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName);
+                trayIcon = System.Drawing.Icon.ExtractAssociatedIcon(exePath)
+                    ?? System.Drawing.SystemIcons.Application;
+            }
+            catch
+            {
+                // keep fallback icon
+            }
+
             _notifyIcon = new System.Windows.Forms.NotifyIcon
             {
-                Icon = System.Drawing.SystemIcons.Application, // Fallback icon
+                Icon = trayIcon,
                 Visible = true,
-                Text = "Dell Gaming Control Center"
+                Text = "GamerHub"
             };
 
             _notifyIcon!.DoubleClick += (s, e) =>
@@ -43,6 +58,25 @@ namespace DellGamingControlCenter.App
             });
 
             _notifyIcon!.ContextMenuStrip = contextMenu;
+        }
+
+        /// <summary>
+        /// Global search: typing in the top bar filters the Game Center library and
+        /// jumps there. No new VM surface — reuses GameCenterViewModel.SearchText
+        /// (which already filters FilteredProfiles) and NavigateGameCenterCommand.
+        /// </summary>
+        private void GlobalSearch_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (DataContext is not ViewModels.MainViewModel vm || sender is not System.Windows.Controls.TextBox tb)
+                return;
+
+            vm.GameCenterViewModel.SearchText = tb.Text ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(tb.Text) &&
+                !ReferenceEquals(vm.CurrentViewModel, vm.GameCenterViewModel))
+            {
+                vm.NavigateGameCenterCommand.Execute(null);
+            }
         }
 
         protected override void OnStateChanged(System.EventArgs e)

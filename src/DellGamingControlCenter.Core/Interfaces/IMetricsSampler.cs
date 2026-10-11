@@ -16,4 +16,5 @@ public interface IMetricsSampler
     
     /// <summary>Clears the buffer.</summary>
     void Clear();
+    event EventHandler<DiagnosticSnapshot> SnapshotCaptured;
 }

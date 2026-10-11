@@ -66,16 +66,66 @@ public class BenchmarkViewModel : BaseViewModel
         
         LoadGames();
     }
+
+    /// <summary>
+    /// Re-entry refresh: the benchmark list must include games the user added in
+    /// Game Center after startup (pages are singletons, so the constructor merge
+    /// alone leaves the list stale). Never mutates the list under an active run.
+    /// </summary>
+    public void RefreshGames()
+    {
+        if (IsRunning) return;
+        LoadGames();
+    }
     
     private void LoadGames()
     {
         DiscoveredGames.Clear();
-        var games = _discoveryService.GetCachedGames();
-        foreach (var g in games) DiscoveredGames.Add(g);
-        
+
+        // B7: the list previously came only from the discovery cache (hard-coded search
+        // paths), so games the user added in Game Center never appeared and the benchmark
+        // buttons looked dead. Merge both sources: user profiles first, then discovery cache.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var p in App.ConfigService.GetGameProfiles())
+        {
+            if (string.IsNullOrWhiteSpace(p.ExecutablePath) || !seen.Add(p.ExecutablePath))
+            {
+                continue;
+            }
+            DiscoveredGames.Add(new DiscoveredGame
+            {
+                Id = p.GameId,
+                Name = p.GameName,
+                ExecutablePath = p.ExecutablePath,
+                InstallDirectory = p.InstallDirectory,
+                ProfileState = ProfileState.Configured
+            });
+        }
+        foreach (var g in _discoveryService.GetCachedGames())
+        {
+            if (string.IsNullOrWhiteSpace(g.ExecutablePath) || !seen.Add(g.ExecutablePath))
+            {
+                continue;
+            }
+            //, keep the discovery entry within the same Id namespace as its profile when one exists
+            var matchedProfile = App.ConfigService.GetGameProfiles().FirstOrDefault(p =>
+                string.Equals(p.ExecutablePath, g.ExecutablePath, StringComparison.OrdinalIgnoreCase));
+            DiscoveredGames.Add(new DiscoveredGame
+            {
+                Id = matchedProfile?.GameId ?? g.Id,
+                Name = g.Name,
+                ExecutablePath = g.ExecutablePath,
+                InstallDirectory = g.InstallDirectory,
+            });
+        }
+
         if (DiscoveredGames.Any())
         {
             SelectedGameId = DiscoveredGames.First().Id;
+        }
+        else
+        {
+            StatusText = "No games to benchmark yet. Add a game in Game Center first.";
         }
     }
     

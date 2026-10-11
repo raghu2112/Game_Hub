@@ -13,92 +13,88 @@ public class SessionMonitoringService : ISessionMonitoringService
     private readonly ILoggingService _logger;
     private readonly IConfigurationService _config;
     
-    private CancellationTokenSource? _cts;
-    private Task? _monitoringTask;
+    private GameSession? _activeSession;
+    private readonly IMetricsSampler _metricsSampler;
 
-    public SessionMonitoringService(ILoggingService logger, IConfigurationService config)
+    public SessionMonitoringService(ILoggingService logger, IConfigurationService config, IMetricsSampler metricsSampler)
     {
         _logger = logger;
         _config = config;
+        _metricsSampler = metricsSampler;
     }
 
     public Task StartMonitoringAsync(GameSession session, CancellationToken cancellationToken)
     {
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _monitoringTask = Task.Run(() => MonitorLoop(session, _cts.Token), _cts.Token);
+        _activeSession = session;
+        _metricsSampler.SnapshotCaptured -= OnSnapshotCaptured; // Defensive unsubscribe
+        _metricsSampler.SnapshotCaptured += OnSnapshotCaptured;
+        _logger.Log("Session monitoring started using MetricsSampler.", LogSeverity.Info, "Monitor");
         return Task.CompletedTask;
     }
 
-    public async Task StopMonitoringAsync(GameSession session)
+    public Task StopMonitoringAsync(GameSession session)
     {
-        if (_cts != null)
-        {
-            _cts.Cancel();
-        }
-        
-        if (_monitoringTask != null)
-        {
-            try { await _monitoringTask; } catch { /* Ignore cancellation */ }
-        }
+        _metricsSampler.SnapshotCaptured -= OnSnapshotCaptured;
+        _activeSession = null;
+        _logger.Log("Session monitoring ended.", LogSeverity.Info, "Monitor");
+        return Task.CompletedTask;
     }
 
-    private async Task MonitorLoop(GameSession session, CancellationToken token)
+    private void OnSnapshotCaptured(object? sender, DiagnosticSnapshot snapshot)
     {
-        int interval = _config.GetConfig().MonitoringIntervalMs;
-        _logger.Log("Session monitoring started.", LogSeverity.Info, "Monitor");
+        var session = _activeSession;
+        if (session == null) return;
 
-        PerformanceCounter? cpuCounter = null;
-        try
+        // CPU Analytics
+        if (snapshot.CpuMetrics.UsagePercent >= 0)
         {
-            cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            cpuCounter.NextValue(); // First call always returns 0
-        }
-        catch
-        {
-            _logger.Log("Could not initialize CPU performance counter.", LogSeverity.Warning, "Monitor");
+            if (snapshot.CpuMetrics.UsagePercent > session.PeakCpuUsage) 
+                session.PeakCpuUsage = snapshot.CpuMetrics.UsagePercent;
+            
+            session.TotalCpuUsage += snapshot.CpuMetrics.UsagePercent;
+            session.CpuSampleCount++;
+            session.AverageCpuUsage = session.TotalCpuUsage / session.CpuSampleCount;
         }
 
-        while (!token.IsCancellationRequested)
+        // RAM Analytics
+        if (snapshot.RamMetrics.UsedBytes > 0)
         {
-            try
+            if (snapshot.RamMetrics.UsedBytes > session.PeakRamUsageBytes) 
+                session.PeakRamUsageBytes = snapshot.RamMetrics.UsedBytes;
+            
+            session.TotalRamUsageBytes += snapshot.RamMetrics.UsedBytes;
+            session.RamSampleCount++;
+            session.AverageRamUsageBytes = session.TotalRamUsageBytes / session.RamSampleCount;
+        }
+
+        // GPU Analytics
+        if (snapshot.GpuMetrics.UsagePercent.HasValue && snapshot.GpuMetrics.UsagePercent.Value >= 0)
+        {
+            if (snapshot.GpuMetrics.UsagePercent.Value > session.PeakGpuUsage)
+                session.PeakGpuUsage = snapshot.GpuMetrics.UsagePercent.Value;
+        }
+
+        // Storage Analytics Extraction
+        if (string.IsNullOrEmpty(session.GameStorageLocation))
+        {
+            try 
             {
-                // Process check
-                var process = Process.GetProcessById(session.ProcessId);
-                if (process.HasExited)
+                var pathRoot = System.IO.Path.GetPathRoot(session.ExecutablePath);
+                if (!string.IsNullOrEmpty(pathRoot))
                 {
-                    _logger.Log($"Process {session.ProcessId} exited. Stopping monitoring.", LogSeverity.Info, "Monitor");
-                    break;
+                    session.GameStorageLocation = $"Local Drive ({pathRoot.TrimEnd('\\')})";
                 }
-
-                // Sample CPU
-                if (cpuCounter != null)
+                else
                 {
-                    double cpu = cpuCounter.NextValue();
-                    if (cpu > session.PeakCpuUsage) session.PeakCpuUsage = cpu;
+                    session.GameStorageLocation = "Unknown Location";
                 }
-
-                // Sample RAM working set
-                long ram = process.WorkingSet64;
-                if (ram > session.PeakRamUsageBytes) session.PeakRamUsageBytes = ram;
-
-                // GPU & Temp requires specialized libraries (LibreHardwareMonitor) so we skip standard polling for safety
-                // We'll leave PeakGpuUsage and Temp as is for now unless integrated with the hardware detector.
-                
             }
-            catch (ArgumentException)
+            catch
             {
-                // Process died
-                break;
+                session.GameStorageLocation = "Unknown Location";
             }
-            catch (Exception ex)
-            {
-                _logger.Log($"Monitor loop error: {ex.Message}", LogSeverity.Warning, "Monitor");
-            }
-
-            await Task.Delay(interval, token);
         }
-        
-        if (cpuCounter != null) cpuCounter.Dispose();
-        _logger.Log("Session monitoring ended.", LogSeverity.Info, "Monitor");
+
+        // Diagnostic Findings removed as snapshot does not contain findings directly
     }
 }

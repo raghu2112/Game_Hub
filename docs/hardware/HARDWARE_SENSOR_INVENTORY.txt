@@ -1,0 +1,86 @@
+================================================================================
+DELL INSPIRON 3576 — HARDWARE SENSOR INVENTORY REPORT
+Timestamp: 2026-10-11 12:28:24 UTC
+Active Provider Pipeline: LibreHardwareMonitor + Windows Native
+================================================================================
+
+--- PROVIDER STATUS ---
+HWiNFO64 Shared Memory Available: False
+LibreHardwareMonitor Available:  True
+Windows Standard Native Available:True
+
+--- CORE SYSTEM METRICS (LATEST SAMPLE) ---
+CPU Usage:               91.5%
+CPU Clock (Live):        N/A [State: Unavailable] (Nominal Base: 2300 MHz)
+CPU Temp:                N/A [State: Unavailable]
+CPU Package Power:       N/A [State: Unavailable]
+CPU Voltage:             N/A [State: Unavailable]
+RAM Used:                10,262 MB / 12,152 MB (84.4%)
+RAM Available:           1,890 MB
+Discrete GPU Usage:      0.0%
+Discrete GPU Temp:       N/A [State: Unavailable]
+Discrete GPU VRAM Dedicated Used: 0 MB / 2039 MB
+Discrete GPU VRAM Shared Used:    0 MB / 6076 MB
+Integrated GPU Usage:    0.2%
+Fan RPM:                 N/A [State: Unavailable]
+
+--- ALL ENUMERATED SENSORS ---
+Hardware                       | Component    | Sensor Name               | Type         | Value           | State        | Provider
+-----------------------------------------------------------------------------------------------------------------------------
+Intel Core i3-7020U            | Cpu          | Core Average              | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | Core Max                  | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #1               | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #1 Distance to TjMax | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #2               | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #2 Distance to TjMax | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core Temperature      | Temperature  | N/A             | Unavailable  | Windows Standard API / Performance Counters
+Intel Core i3-7020U            | Cpu          | CPU Package               | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #1               | Clock        | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #2               | Clock        | N/A             | Unavailable  | LibreHardwareMonitor
+Processor                      | Cpu          | CPU Core #0 Usage         | Load         | 98.5 %          | Available    | Windows Standard API / Performance Counters
+Intel Core i3-7020U            | Cpu          | CPU Core #1 Thread #1     | Load         | 98.5 %          | Available    | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #1 Thread #2     | Load         | 85.3 %          | Available    | LibreHardwareMonitor
+Processor                      | Cpu          | CPU Core #1 Usage         | Load         | 85.3 %          | Available    | Windows Standard API / Performance Counters
+Intel Core i3-7020U            | Cpu          | CPU Core #2 Thread #1     | Load         | 85.3 %          | Available    | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Core #2 Thread #2     | Load         | 97.1 %          | Available    | LibreHardwareMonitor
+Processor                      | Cpu          | CPU Core #2 Usage         | Load         | 83.8 %          | Available    | Windows Standard API / Performance Counters
+Processor                      | Cpu          | CPU Core #3 Usage         | Load         | 97.1 %          | Available    | Windows Standard API / Performance Counters
+Intel Core i3-7020U            | Cpu          | CPU Core Max              | Load         | 98.5 %          | Available    | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Total                 | Load         | 91.5 %          | Available    | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Cores                 | Power        | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Memory                | Power        | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Package               | Power        | N/A             | Unavailable  | LibreHardwareMonitor
+Intel Core i3-7020U            | Cpu          | CPU Platform              | Power        | N/A             | Unavailable  | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | GPU Core                  | Temperature  | N/A             | Unavailable  | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | D3D                       | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D 3D                    | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Compute 0             | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Compute 1             | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Copy                  | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | D3D GDI Render            | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | D3D Overlay               | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Timer 0               | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | D3D Video Decode          | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | D3D Video Processing      | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+GPU Engine                     | Gpu          | GPU 3D Engine Usage       | Load         | 0.1 %           | Available    | Windows Standard API / Performance Counters
+Radeon (TM) 520                | Gpu          | GPU Core                  | Load         | 0.0 %           | Available    | LibreHardwareMonitor
+Intel(R) HD Graphics 620       | Gpu          | GPU Power                 | Power        | N/A             | Unavailable  | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | GPU Fan                   | Fan          | N/A             | Unavailable  | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Dedicated Memory Free | Data         | 2039.2 MB       | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Dedicated Memory Total | Data         | 2039.2 MB       | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Dedicated Memory Used | Data         | 0.0 MB          | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Shared Memory Free    | Data         | 6075.9 MB       | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Shared Memory Total   | Data         | 6076.4 MB       | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | D3D Shared Memory Used    | Data         | 0.5 MB          | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | GPU Memory Used           | Data         | 0.0 MB          | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | Fullscreen FPS            | Factor       | -1.0            | Available    | LibreHardwareMonitor
+Radeon (TM) 520                | Gpu          | GPU Fan                   | Control      | 20.0 %          | Available    | LibreHardwareMonitor
+Virtual Memory                 | Memory       | Memory                    | Load         | 75.2 %          | Available    | LibreHardwareMonitor
+Virtual Memory                 | Memory       | Memory Available          | Data         | 4.9 GB          | Available    | LibreHardwareMonitor
+Virtual Memory                 | Memory       | Memory Used               | Data         | 14.9 GB         | Available    | LibreHardwareMonitor
+\_TZ.THM                       | Motherboard  | ACPI Thermal Zone         | Temperature  | 25.0 °C         | Available    | Windows Standard API / Performance Counters
+
+--- TIME-SERIES SAMPLING VERIFICATION ---
+Sample #1 @ 12:28:22.598 => CPU Load: 100.0%, RAM: 83.6%, Discrete GPU Load: 0.0%
+Sample #2 @ 12:28:23.907 => CPU Load: 100.0%, RAM: 83.9%, Discrete GPU Load: 0.0%
+Sample #3 @ 12:28:24.967 => CPU Load: 91.5%, RAM: 84.4%, Discrete GPU Load: 0.0%

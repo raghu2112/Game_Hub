@@ -14,9 +14,9 @@ public class SystemHealthAnalyzer : ISystemHealthAnalyzer
         var snaps = history.ToList();
         if (snaps.Count == 0) return new GamingHealthScore { OverallScore = 100 };
 
-        double avgCpu = snaps.Average(s => s.CpuUtilization);
-        double avgGpu = snaps.Average(s => s.GpuUtilization);
-        double avgRam = snaps.Average(s => (double)s.UsedRamBytes / s.TotalRamBytes);
+        double avgCpu = snaps.Average(s => s.CpuMetrics.UsagePercent);
+        double avgGpu = snaps.Average(s => s.GpuMetrics.UsagePercent ?? 0);
+        double avgRam = snaps.Average(s => s.RamMetrics.TotalBytes > 0 ? (double)s.RamMetrics.UsedBytes / s.RamMetrics.TotalBytes : 0);
         
         int cpuScore = 100 - (int)(Math.Max(0, avgCpu - 50) * 2); // Drops fast after 50%
         int gpuScore = 100 - (int)(Math.Max(0, avgGpu - 80) * 3); // Drops fast after 80%

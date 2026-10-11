@@ -9,7 +9,7 @@ using DellGamingControlCenter.Core.Models;
 
 public class RecommendationEngine : IRecommendationEngine
 {
-    public List<OptimizationRecommendation> GenerateRecommendations(IEnumerable<BottleneckResult> bottlenecks, GameProfile profile)
+    public List<OptimizationRecommendation> GenerateRecommendations(IEnumerable<DiagnosticFinding> bottlenecks, GameProfile profile)
     {
         var recommendations = new List<OptimizationRecommendation>();
         
@@ -43,38 +43,38 @@ public class RecommendationEngine : IRecommendationEngine
         }
 
         // Bottleneck-based recommendations
-        foreach (var bottleneck in bottlenecks)
+        foreach (var finding in bottlenecks)
         {
-            if (bottleneck.Type == BottleneckType.GPU)
+            if (finding.Category == DiagnosticCategory.GPU)
             {
                 recommendations.Add(new OptimizationRecommendation
                 {
                     Title = "Reduce GPU-heavy graphics settings",
-                    Reason = bottleneck.Evidence,
-                    Priority = bottleneck.Severity == Severity.Critical ? PriorityLevel.High : PriorityLevel.Medium,
+                    Reason = finding.Evidence,
+                    Priority = finding.Severity == DiagnosticSeverity.Critical ? PriorityLevel.High : PriorityLevel.Medium,
                     ExpectedImpact = ImpactLevel.High,
                     Risk = RiskLevel.None,
                     Source = "Diagnostic Engine"
                 });
             }
-            else if (bottleneck.Type == BottleneckType.CPU)
+            else if (finding.Category == DiagnosticCategory.CPU)
             {
                 recommendations.Add(new OptimizationRecommendation
                 {
                     Title = "Reduce CPU-sensitive settings (e.g. shadows, draw distance, physics)",
-                    Reason = bottleneck.Evidence,
-                    Priority = bottleneck.Severity == Severity.Critical ? PriorityLevel.High : PriorityLevel.Medium,
+                    Reason = finding.Evidence,
+                    Priority = finding.Severity == DiagnosticSeverity.Critical ? PriorityLevel.High : PriorityLevel.Medium,
                     ExpectedImpact = ImpactLevel.Medium,
                     Risk = RiskLevel.None,
                     Source = "Diagnostic Engine"
                 });
             }
-            else if (bottleneck.Type == BottleneckType.Memory)
+            else if (finding.Category == DiagnosticCategory.Memory)
             {
                 recommendations.Add(new OptimizationRecommendation
                 {
-                    Title = "Close background applications",
-                    Reason = bottleneck.Evidence,
+                    Title = finding.RecommendedAction,
+                    Reason = finding.Evidence,
                     Priority = PriorityLevel.High,
                     ExpectedImpact = ImpactLevel.High,
                     Risk = RiskLevel.Low,

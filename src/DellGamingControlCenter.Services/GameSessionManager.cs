@@ -13,43 +13,70 @@ public class GameSessionManager : IGameSessionManager
 {
     private readonly ILoggingService _logger;
     private readonly IGameLauncher _launcher;
-    private readonly IPerformanceModeService _perfService;
     private readonly ISessionMonitoringService _monitor;
     private readonly IBackgroundProcessManager _bgManager;
     private readonly IConfigurationService _config;
-    private readonly IOptimizationEngine _optimizationEngine;
+    private readonly IPolicyEvaluator _policyEvaluator;
 
     private readonly ConcurrentDictionary<string, GameSession> _activeSessions = new();
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _sessionTokens = new();
 
-    private readonly IHardwareDetector _hardwareDetector;
+    // Roots the fire-and-forget exit watcher while it is suspended. Without an external
+    // reference, a suspended `await` inside a discarded task is only kept alive through a
+    // circular reference (task → continuation → state machine → awaiter → task) — a GC
+    // island. When collected, the Process object dies with it and its Exited registration
+    // is finalized away: the session stays Running forever and policies are never restored.
+    // Observed intermittently under memory pressure; timing-dependent, hence rare.
+    private readonly ConcurrentDictionary<string, Task> _watcherTasks = new();
+
+    public event EventHandler<GameSessionEventArgs>? SessionChanged;
+
+    public GameSession? GetActiveSession()
+    {
+        return _activeSessions.Values.FirstOrDefault(s => s.CurrentState == GameSessionState.Running || s.CurrentState == GameSessionState.Launching || s.CurrentState == GameSessionState.WaitingForProcess);
+    }
+
+    private readonly ICpuTelemetryService _cpuTelemetry;
+    private readonly IMemoryTelemetryService _memoryTelemetry;
     private readonly IGamePerformanceAnalyzer _performanceAnalyzer;
 
     public GameSessionManager(
         ILoggingService logger,
         IGameLauncher launcher,
-        IPerformanceModeService perfService,
         ISessionMonitoringService monitor,
         IBackgroundProcessManager bgManager,
         IConfigurationService config,
-        IOptimizationEngine optimizationEngine,
-        IHardwareDetector hardwareDetector,
+        IPolicyEvaluator policyEvaluator,
+        ICpuTelemetryService cpuTelemetry,
+        IMemoryTelemetryService memoryTelemetry,
         IGamePerformanceAnalyzer performanceAnalyzer)
     {
         _logger = logger;
         _launcher = launcher;
-        _perfService = perfService;
         _monitor = monitor;
         _bgManager = bgManager;
         _config = config;
-        _optimizationEngine = optimizationEngine;
-        _hardwareDetector = hardwareDetector;
+        _policyEvaluator = policyEvaluator;
+        _cpuTelemetry = cpuTelemetry;
+        _memoryTelemetry = memoryTelemetry;
         _performanceAnalyzer = performanceAnalyzer;
     }
 
+    private readonly SemaphoreSlim _launchLock = new SemaphoreSlim(1, 1);
+
     public async Task<GameSession> StartSessionAsync(GameProfile profile)
     {
-        _logger.Log($"Orchestrating game session for {profile.GameName}...", LogSeverity.Info, "SessionManager");
+        await _launchLock.WaitAsync();
+        try
+        {
+            if (GetActiveSession() != null)
+            {
+                _logger.Log($"Rejected session for {profile.GameName}: Another session is already active.", LogSeverity.Warning, "SessionManager");
+                return new GameSession { CurrentState = GameSessionState.Failed, FailureReason = "Another session is already active." };
+            }
+
+            _logger.Log($"Orchestrating game session for {profile.GameName}...", LogSeverity.Info, "SessionManager");
+
 
         var cts = new CancellationTokenSource();
         var session = await _launcher.LaunchGameAsync(profile, cts.Token);
@@ -59,31 +86,24 @@ public class GameSessionManager : IGameSessionManager
 
         if (session.CurrentState == GameSessionState.Failed || session.CurrentState == GameSessionState.Cancelled)
         {
+            await RestoreFailedSessionAsync(session);
+            SessionChanged?.Invoke(this, new GameSessionEventArgs(session));
             return session;
         }
 
         // Capture Baseline Snapshot
-        var hw = _hardwareDetector.GetSnapshot();
-        var cpuMetrics = _hardwareDetector.GetCpuMetrics();
-        var ramMetrics = _hardwareDetector.GetRamMetrics();
+        var cpuMetrics = _cpuTelemetry.GetMetrics() ?? new CpuMetrics();
+        var ramMetrics = _memoryTelemetry.GetMetrics() ?? new RamMetrics();
         
         session.Baseline = new BaselineSnapshot
         {
             CpuUsage = cpuMetrics.UsagePercent,
             RamUsageBytes = ramMetrics.UsedBytes,
             AvailableRamBytes = ramMetrics.AvailableBytes,
-            PowerMode = _perfService.GetCurrentMode().ToString(),
+            PowerMode = "Unknown", // Will be tracked internally by policy evaluator
             Timestamp = DateTime.UtcNow
         };
         session.TimelineEvents.Add(new PerformanceEvent { Type = PerformanceEventType.GameStarted, Description = $"Started {session.GameName}" });
-
-        // Apply Performance Mode if requested
-        if (profile.PerformanceMode != PerformanceMode.Balanced)
-        {
-            session.OriginalSystemState.PreviousPowerSchemeName = _perfService.GetCurrentMode().ToString();
-            await _perfService.ApplyModeAsync(profile.PerformanceMode);
-            session.TimelineEvents.Add(new PerformanceEvent { Type = PerformanceEventType.PowerModeChanged, Description = $"Power Mode changed to {profile.PerformanceMode}" });
-        }
 
         // Wait for process
         var pid = await _launcher.FindGameProcessAsync(session, profile, cts.Token);
@@ -92,23 +112,41 @@ public class GameSessionManager : IGameSessionManager
             session.ProcessId = pid.Value;
             session.CurrentState = GameSessionState.Running;
             
-            // Apply Runtime Priority
-            await _launcher.ApplyRuntimeOptimizationsAsync(session, pid.Value);
+            // Apply Post-Launch Policy (e.g. Process Priority)
+            var policyResult = await _policyEvaluator.ApplyPostLaunchPoliciesAsync(profile, session);
+            
+            foreach (var policy in policyResult.AppliedPolicies)
+            {
+                session.AppliedChanges.Add(new OptimizationAction { Description = policy.PolicyName, Value = policy.Status });
+            }
+
+            if (!policyResult.Success)
+            {
+                _logger.Log($"Some post-launch policies failed to apply for {profile.GameName}.", LogSeverity.Warning, "SessionManager");
+            }
+            session.TimelineEvents.Add(new PerformanceEvent { Type = PerformanceEventType.PowerModeChanged, Description = $"Profile policies applied." });
 
             // Start Monitoring
             _ = _monitor.StartMonitoringAsync(session, cts.Token);
 
-            // Start background watcher for exit
-            _ = WatchProcessAsync(session);
+            // Start background watcher for exit (rooted in _watcherTasks so GC cannot collect it)
+            _watcherTasks[session.SessionId] = WatchProcessAsync(session);
         }
         else
         {
-            session.CurrentState = GameSessionState.CompletedWithWarnings;
-            _logger.Log($"Process not detected. Session {session.SessionId} will not be monitored.", LogSeverity.Warning, "SessionManager");
-            await RestoreSessionAsync(session);
+            session.CurrentState = GameSessionState.Failed;
+            session.FailureReason = "Process exited immediately or could not be detected.";
+            _logger.Log($"Process not detected. Session {session.SessionId} failed and will be restored.", LogSeverity.Error, "SessionManager");
+            await RestoreFailedSessionAsync(session);
         }
 
+        SessionChanged?.Invoke(this, new GameSessionEventArgs(session));
         return session;
+        }
+        finally
+        {
+            _launchLock.Release();
+        }
     }
 
     public async Task StopSessionAsync(string sessionId)
@@ -142,59 +180,98 @@ public class GameSessionManager : IGameSessionManager
         try
         {
             var process = Process.GetProcessById(session.ProcessId);
-            process.EnableRaisingEvents = true;
             
-            var tcs = new TaskCompletionSource();
-            process.Exited += (s, e) => tcs.TrySetResult();
-
-            if (process.HasExited)
+            try
             {
-                tcs.TrySetResult();
-            }
+                process.EnableRaisingEvents = true;
+                var tcs = new TaskCompletionSource();
+                process.Exited += (s, e) => tcs.TrySetResult();
 
-            await tcs.Task;
+                if (process.HasExited)
+                {
+                    tcs.TrySetResult();
+                }
+
+                // Safety net: a 1 s HasExited poll alongside the event. The event is
+                // primary (verified: it wins on this machine); the poll is cheap,
+                // timer-rooted (immune to GC island issues), and bounds the worst case
+                // to one extra second should the Exited callback ever be skipped.
+                var poll = Task.Run(async () =>
+                {
+                    while (!process.HasExited)
+                    {
+                        await Task.Delay(1000);
+                        process.Refresh();
+                    }
+                });
+
+                await Task.WhenAny(tcs.Task, poll);
+            }
+            catch (Exception ex) // usually Win32Exception or InvalidOperationException
+            {
+                _logger.Log($"Could not attach events to process {session.ProcessId}. Falling back to polling. ({ex.Message})", LogSeverity.Warning, "SessionManager");
+                // Fallback polling loop
+                while (!process.HasExited)
+                {
+                    await Task.Delay(2000);
+                    process.Refresh();
+                }
+            }
+            
             await HandleProcessExitAsync(session.SessionId);
         }
         catch
         {
-            // Process might have already exited fast or access denied
+            // Process already exited, not found, or total access denied
             await HandleProcessExitAsync(session.SessionId);
+        }
+        finally
+        {
+            _watcherTasks.TryRemove(session.SessionId, out _);
         }
     }
 
+    private async Task RestoreFailedSessionAsync(GameSession session)
+    {
+        _logger.Log($"Restoring policies for failed session {session.SessionId}...", LogSeverity.Info, "SessionManager");
+
+        var gameProfile = _config.GetConfig().GameProfiles.FirstOrDefault(p => p.GameId == session.GameId);
+        if (gameProfile != null)
+        {
+            await _policyEvaluator.RestoreProfileAsync(gameProfile, session);
+        }
+
+        _activeSessions.TryRemove(session.SessionId, out _);
+        _sessionTokens.TryRemove(session.SessionId, out _);
+    }
+
+    private readonly object _restoreLock = new object();
+
     private async Task RestoreSessionAsync(GameSession session)
     {
-        if (session.CurrentState == GameSessionState.Restoring || session.CurrentState == GameSessionState.Completed)
-            return;
+        lock (_restoreLock)
+        {
+            if (session.CurrentState == GameSessionState.Restoring || 
+                session.CurrentState == GameSessionState.Completed || 
+                session.CurrentState == GameSessionState.CompletedWithWarnings)
+            {
+                return;
+            }
+            session.CurrentState = GameSessionState.Restoring;
+        }
 
-        session.CurrentState = GameSessionState.Restoring;
         _logger.Log($"Restoring system state for session {session.SessionId}...", LogSeverity.Info, "SessionManager");
 
         await _monitor.StopMonitoringAsync(session);
 
         bool allRestored = true;
 
-        // Restore Power Mode
-        if (session.OriginalSystemState.PreviousPowerSchemeName != null)
+        // Restore applied policies via Evaluator
+        var gameProfile = _config.GetConfig().GameProfiles.FirstOrDefault(p => p.GameId == session.GameId);
+        if (gameProfile != null)
         {
-            allRestored &= await _perfService.RestorePreviousModeAsync();
-        }
-
-        // Restore Process Priorities (if the process is still somehow alive but we're restoring, we'd revert it)
-        // Usually it's dead by now, so no action required for dead processes.
-
-        // Rollback Optimization Engine Changes (Registry, Game Mode, GPU Pref)
-        if (session.AppliedChanges.Count > 0)
-        {
-            var rollbackPlan = new OptimizationPlan
-            {
-                PlanId = session.OptimizationSessionId,
-                GameId = session.GameId,
-                GameName = session.GameName,
-                Actions = session.AppliedChanges
-            };
-            allRestored &= await _optimizationEngine.RollbackPlanAsync(rollbackPlan);
-            session.RestoredChanges = session.AppliedChanges;
+            var restoreSuccess = await _policyEvaluator.RestoreProfileAsync(gameProfile, session);
+            allRestored &= restoreSuccess;
         }
 
         session.RestorationSuccessful = allRestored;
@@ -210,9 +287,18 @@ public class GameSessionManager : IGameSessionManager
         // Save to history
         var config = _config.GetConfig();
         config.SessionHistory.Add(session);
+        
+        // Phase 8: Bounded history to 100
+        while (config.SessionHistory.Count > 100)
+        {
+            config.SessionHistory.RemoveAt(0); // Remove oldest
+        }
+        
         _config.SaveConfig(config);
 
         _activeSessions.TryRemove(session.SessionId, out _);
         _sessionTokens.TryRemove(session.SessionId, out _);
+        
+        SessionChanged?.Invoke(this, new GameSessionEventArgs(session));
     }
 }

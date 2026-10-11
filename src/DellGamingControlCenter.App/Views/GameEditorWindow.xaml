@@ -1,0 +1,124 @@
+<Window x:Class="DellGamingControlCenter.App.Views.GameEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Title}" Height="680" Width="580"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        TextElement.Foreground="{StaticResource TextPrimaryBrush}">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,14">
+            <TextBlock Text="GAME PROFILE" Style="{StaticResource SubheaderStyle}"/>
+            <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Margin="0,4,0,0"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <!-- Game Name -->
+                <TextBlock Text="GAME NAME" Style="{StaticResource TelemetryLabelStyle}" Margin="0,0,0,5"/>
+                <TextBox x:Name="GameNameBox" Text="{Binding GameName, UpdateSourceTrigger=PropertyChanged}"
+                         TextChanged="GameName_TextChanged"/>
+
+                <!-- Executable -->
+                <TextBlock Text="EXECUTABLE" Style="{StaticResource TelemetryLabelStyle}" Margin="0,16,0,5"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource ClayInset}" Padding="10,9"
+                            Visibility="{Binding HasExecutable, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="{Binding ExecutablePath}" FontFamily="{StaticResource MonoFont}" FontSize="11.5"
+                                   Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    </Border>
+                    <TextBlock Grid.Column="0" Text="No executable selected — use Browse to pick the game's .exe"
+                               FontSize="12" FontStyle="Italic" Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="10,0,0,0"
+                               Visibility="{Binding HasExecutable, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Grid.Column="1" Content="BROWSE…" Command="{Binding BrowseCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"/>
+                </Grid>
+                <TextBlock Text="Any valid Windows game executable is supported (e.g. C:\Games\Game\game.exe)."
+                           Foreground="{StaticResource TextMutedBrush}" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap"/>
+
+                <!-- Launch Arguments -->
+                <TextBlock Text="LAUNCH ARGUMENTS (OPTIONAL)" Style="{StaticResource TelemetryLabelStyle}" Margin="0,16,0,5"/>
+                <TextBox Text="{Binding LaunchArguments, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Policies -->
+                <TextBlock Text="GAME POLICIES" Style="{StaticResource TelemetryLabelStyle}" Margin="0,18,0,8"/>
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="GPU Preference" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <ListBox Grid.Column="1" ItemsSource="{Binding GpuPreferences}" SelectedItem="{Binding SelectedGpuPreference}"
+                             IsEnabled="{Binding IsGpuPreferenceSupported}" Margin="0,2,0,2"
+                             Style="{StaticResource ClaySegmented}"/>
+                </Grid>
+                <TextBlock Text="GPU selection is not supported on this hardware; Automatic is used."
+                           Foreground="{StaticResource WarningBrush}" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap"
+                           Visibility="{Binding IsGpuPreferenceSupported, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Power Policy" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <ListBox Grid.Column="1" ItemsSource="{Binding PerformanceModes}" SelectedItem="{Binding SelectedPerformanceMode}"
+                             Margin="0,2,0,2" Style="{StaticResource ClaySegmented}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Process Priority" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <ListBox Grid.Column="1" ItemsSource="{Binding ProcessPriorities}" SelectedItem="{Binding SelectedProcessPriority}"
+                             Margin="0,2,0,2" Style="{StaticResource ClaySegmented}"/>
+                </Grid>
+
+                <!-- Unsupported capability honesty note (spec §7.2) -->
+                <Border Style="{StaticResource UnsupportedCapabilityStyle}" Margin="0,16,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Fan control: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding FanControlStatus}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" FontStyle="Italic"/>
+                        <TextBlock Text="   ·   Thermal control: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding ThermalControlStatus}" Foreground="{StaticResource TextMutedBrush}" FontSize="12" FontStyle="Italic"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer: validation + actions -->
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <TextBlock Text="{Binding ValidationMessage}" Foreground="{StaticResource ErrorBrush}"
+                       FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="300"
+                       HorizontalAlignment="Left"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="SAVE" Command="{Binding SaveCommand}" Style="{StaticResource ActionButtonStyle}"
+                        Width="92" Margin="0,0,10,0" IsDefault="True"/>
+                <Button Content="CANCEL" Command="{Binding CancelCommand}" Style="{StaticResource SecondaryButtonStyle}"
+                        Width="92" IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

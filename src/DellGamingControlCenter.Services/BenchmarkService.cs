@@ -16,11 +16,44 @@ public class BenchmarkService : IBenchmarkService
 
     public BenchmarkService()
     {
-        _baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "benchmarks");
-        if (!Directory.Exists(_baseDir))
+        // Installed runs live under Program Files — writable user data must go to
+        // %LocalAppData%\DellGamingControlCenter (see review finding: UnauthorizedAccessException).
+        _baseDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "DellGamingControlCenter", "benchmarks");
+        try
         {
-            Directory.CreateDirectory(_baseDir);
+            if (!Directory.Exists(_baseDir))
+            {
+                Directory.CreateDirectory(_baseDir);
+            }
         }
+        catch (Exception)
+        {
+            // Never fail startup over benchmark cache: degrade to a temp location instead.
+            _baseDir = Path.Combine(Path.GetTempPath(), "GamerHub_benchmarks");
+        }
+    }
+
+    /// <summary>Real hardware identity for benchmark metadata — no vendor branding, no hardcoding.</summary>
+    private static string GetHardwareSnapshot()
+    {
+        try
+        {
+            using var searcher = new System.Management.ManagementObjectSearcher("SELECT Manufacturer, Model FROM Win32_ComputerSystem");
+            foreach (var obj in searcher.Get())
+            {
+                var manufacturer = obj["Manufacturer"]?.ToString()?.Trim() ?? "";
+                var model = obj["Model"]?.ToString()?.Trim() ?? "";
+                var system = string.Join(" ", new[] { manufacturer, model }.Where(s => s.Length > 0));
+                return string.IsNullOrEmpty(system) ? "Unknown system" : system;
+            }
+        }
+        catch
+        {
+            // WMI unavailable — keep the benchmark functional with a generic label.
+        }
+        return "Unknown system";
     }
 
     private string GetGameDir(string gameId)
@@ -42,9 +75,8 @@ public class BenchmarkService : IBenchmarkService
             Type = type,
             IsBaseline = isBaseline,
             Timestamp = DateTime.UtcNow,
-            // Track HW - simplified for this implementation layer
             OsVersion = Environment.OSVersion.VersionString,
-            HardwareSnapshot = "Dell Inspiron 3576, i3-7020U, 12GB RAM, AMD Radeon 520",
+            HardwareSnapshot = GetHardwareSnapshot(),
             OptimizationStateHash = $"Gpu:{profile.PreferredGpu},Power:{profile.PerformanceMode},Priority:{profile.ProcessPriority}"
         };
 

@@ -46,8 +46,14 @@ public class AsyncRelayCommand : ICommand
         }
         catch (Exception ex)
         {
-            // Suppress crash to avoid terminating the application.
-            System.Diagnostics.Debug.WriteLine($"AsyncRelayCommand Exception: {ex}");
+            // B11: keep the app alive but leave a real diagnostic trail and surface a
+            // visible message — the previous Debug-only swallow hid every command failure.
+            DellGamingControlCenter.App.App.Logger?.Log($"Command '{_executeAsync.Method.Name}' failed: {ex}", DellGamingControlCenter.Core.Enums.LogSeverity.Error, "UI");
+            var mainWindow = System.Windows.Application.Current?.MainWindow;
+            if (mainWindow != null)
+            {
+                System.Windows.MessageBox.Show(mainWindow, $"{ex.Message}", "Action failed", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
         finally
         {
