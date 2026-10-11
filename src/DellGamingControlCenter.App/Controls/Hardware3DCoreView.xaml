@@ -31,10 +31,10 @@
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,10,0,0">
                     <StackPanel Orientation="Horizontal">
                         <Border Width="6" Height="6" CornerRadius="1" Background="{StaticResource PrimaryAccentBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="SCHEMATIC TOPOLOGY // THERMAL PACKAGE" FontFamily="{StaticResource MonoFont}" FontSize="9.5"
+                        <TextBlock Text="HARDWARE ENGINE // CORE CHASSIS" FontFamily="{StaticResource MonoFont}" FontSize="9.5"
                                    FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}"/>
                     </StackPanel>
-                    <TextBlock Text="Generic Direct3D Micro-Architecture Visualization" FontFamily="{StaticResource PrimaryFont}" FontSize="9"
+                    <TextBlock Text="Geometric 3D Viewport // Interactive Telemetry Model" FontFamily="{StaticResource PrimaryFont}" FontSize="9"
                                Foreground="{StaticResource TextMutedBrush}" Margin="12,2,0,0"/>
                 </StackPanel>
 

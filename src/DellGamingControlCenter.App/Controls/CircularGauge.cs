@@ -46,7 +46,7 @@ public sealed class CircularGauge : FrameworkElement
 
     public static readonly DependencyProperty AccentBrushProperty = DependencyProperty.Register(
         nameof(AccentBrush), typeof(Brush), typeof(CircularGauge),
-        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x42, 0xD9, 0xF5)),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x8B, 0x5C, 0xF6)),
             FrameworkPropertyMetadataOptions.AffectsRender));
 
     public Brush AccentBrush
@@ -57,7 +57,7 @@ public sealed class CircularGauge : FrameworkElement
 
     public static readonly DependencyProperty TrackBrushProperty = DependencyProperty.Register(
         nameof(TrackBrush), typeof(Brush), typeof(CircularGauge),
-        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x1A, 0x1D, 0x20)),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x20, 0x26, 0x38)),
             FrameworkPropertyMetadataOptions.AffectsRender));
 
     public Brush TrackBrush
@@ -133,9 +133,9 @@ public sealed class CircularGauge : FrameworkElement
         return new Point(center.X + radius * Math.Cos(rad), center.Y + radius * Math.Sin(rad));
     }
 
-    private static readonly Brush ValueBrush = Frozen(Color.FromRgb(0xE8, 0xEC, 0xEF));
-    private static readonly Brush LabelBrush = Frozen(Color.FromRgb(0xA6, 0xAF, 0xB7));
-    private static readonly Brush DisallowedBrush = Frozen(Color.FromRgb(0x82, 0x8E, 0x98));
+    private static readonly Brush ValueBrush = Frozen(Color.FromRgb(0xF2, 0xF3, 0xF8));
+    private static readonly Brush LabelBrush = Frozen(Color.FromRgb(0x9B, 0xA2, 0xB8));
+    private static readonly Brush DisallowedBrush = Frozen(Color.FromRgb(0x9B, 0xA2, 0xB8));
 
     private static Brush Frozen(Color c)
     {

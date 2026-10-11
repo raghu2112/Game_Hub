@@ -30,7 +30,7 @@ public sealed class UsageGraph : FrameworkElement
 
     public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(
         nameof(Stroke), typeof(Brush), typeof(UsageGraph),
-        new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x42, 0xD9, 0xF5))));
+        new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x8B, 0x5C, 0xF6))));
 
     public Brush Stroke
     {
@@ -115,8 +115,6 @@ public sealed class UsageGraph : FrameworkElement
 
         double stepX = w / (n - 1);
         var stroke = Stroke;
-        var pen = stroke != null ? new Pen(stroke, 1.5) : LinePen;
-        if (pen.CanFreeze) pen.Freeze();
 
         // Build the polyline; a null sample breaks the line into segments.
         var figureGeo = new StreamGeometry();
@@ -140,7 +138,7 @@ public sealed class UsageGraph : FrameworkElement
             }
         }
         figureGeo.Freeze();
-        dc.DrawGeometry(null, pen, figureGeo);
+        dc.DrawGeometry(null, LinePen, figureGeo);
     }
 
     private void DrawStatus(DrawingContext dc, double w, double h, string text)
@@ -152,10 +150,10 @@ public sealed class UsageGraph : FrameworkElement
 
     private static readonly Typeface Typeface = new(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
 
-    private static readonly Brush BackdropBrush = new SolidColorBrush(Color.FromRgb(0x0C, 0x0E, 0x10));
-    private static readonly Brush StatusBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xAF, 0xB7));
-    private static readonly Pen GridPen = CreatePen(0x40, 0x2E, 0x34, 0x3A, 1);
-    private static readonly Pen LinePen = CreatePen(0xFF, 0x42, 0xD9, 0xF5, 1.5);
+    private static readonly Brush BackdropBrush = new SolidColorBrush(Color.FromArgb(0x40, 0x14, 0x17, 0x21));
+    private static readonly Brush StatusBrush = new SolidColorBrush(Color.FromRgb(0x9B, 0xA2, 0xB8));
+    private static readonly Pen GridPen = CreatePen(0x33, 0x26, 0x2C, 0x3E, 1);
+    private static readonly Pen LinePen = CreatePen(0xFF, 0x8B, 0x5C, 0xF6, 1.6);
 
     private static Pen CreatePen(byte a, byte r, byte g, byte b, double thickness)
     {

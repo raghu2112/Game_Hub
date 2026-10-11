@@ -9,35 +9,35 @@
          Single source of truth. Views must not hard-code colors.
          ══════════════════════════════════════════════════════════════════════ -->
 
-    <!-- ── Colors: surfaces — GamerHub Precision (Graphite & Gunmetal) ─── -->
-    <Color x:Key="AppBackgroundPrimaryColor">#111315</Color>   <!-- deep neutral graphite -->
-    <Color x:Key="AppBackgroundSecondaryColor">#1A1D20</Color> <!-- charcoal / dark gunmetal panels -->
-    <Color x:Key="AppBackgroundTertiaryColor">#22272B</Color>  <!-- raised / active panels -->
-    <Color x:Key="AppInsetSurfaceColor">#0C0E10</Color>        <!-- near-black recessed wells -->
-    <Color x:Key="AppClayHighlightColor">#282D32</Color>       <!-- subtle highlight -->
-    <Color x:Key="AppBorderColor">#2E343A</Color>              <!-- fine low-contrast line -->
-    <Color x:Key="AppBorderLiftColor">#3E464E</Color>          <!-- subtle lit edge -->
+    <!-- ── Colors: surfaces (spec §3.1) ─────────────────────────────────── -->
+    <Color x:Key="AppBackgroundPrimaryColor">#171521</Color>   <!-- main app background -->
+    <Color x:Key="AppBackgroundSecondaryColor">#211E30</Color> <!-- primary cards/panels -->
+    <Color x:Key="AppBackgroundTertiaryColor">#29243B</Color>  <!-- raised/extruded cards -->
+    <Color x:Key="AppInsetSurfaceColor">#191725</Color>        <!-- recessed meters/containers -->
+    <Color x:Key="AppClayHighlightColor">#362F4A</Color>       <!-- subtle highlight -->
+    <Color x:Key="AppBorderColor">#3D3552</Color>              <!-- subtle edge -->
+    <Color x:Key="AppBorderLiftColor">#4A4066</Color>          <!-- lit top edge for extrusion -->
 
-    <!-- ── Colors: accents — Signal Cyan & Neutral Silver ─────────────── -->
-    <Color x:Key="AppAccentColor">#42D9F5</Color>              <!-- primary accent: electric signal cyan -->
-    <Color x:Key="AppAccentHoverColor">#62E2F9</Color>         <!-- accent hover -->
-    <Color x:Key="AppAccentDimColor">#16323B</Color>           <!-- selected dark cyan-slate fill -->
-    <Color x:Key="AppAccentSecondaryColor">#9DA7B0</Color>     <!-- secondary accent: neutral silver -->
-    <Color x:Key="AppTelemetryColor">#42D9F5</Color>           <!-- signal cyan telemetry -->
-    <Color x:Key="AppMagentaColor">#38BDF8</Color>             <!-- signal sky/cyan secondary channel -->
-    <Color x:Key="AppInfoColor">#42D9F5</Color>                <!-- information = cyan -->
+    <!-- ── Colors: accents (spec §3.1) ──────────────────────────────────── -->
+    <Color x:Key="AppAccentColor">#A78BFA</Color>              <!-- primary accent (precision violet) -->
+    <Color x:Key="AppAccentHoverColor">#C4B5FD</Color>         <!-- accent hover -->
+    <Color x:Key="AppAccentDimColor">#4C3F7A</Color>           <!-- selected fill -->
+    <Color x:Key="AppAccentSecondaryColor">#C4B5FD</Color>     <!-- highlights/selected values -->
+    <Color x:Key="AppTelemetryColor">#67E8F9</Color>           <!-- cyan telemetry accent -->
+    <Color x:Key="AppMagentaColor">#EC4899</Color>             <!-- optional highlight -->
+    <Color x:Key="AppInfoColor">#67E8F9</Color>                <!-- information = cyan -->
 
-    <!-- ── Colors: text (neutral high-legibility) ─────────────────────── -->
-    <Color x:Key="AppTextPrimaryColor">#E8ECEF</Color>         <!-- crisp primary white -->
-    <Color x:Key="AppTextSecondaryColor">#A6AFB7</Color>       <!-- neutral secondary silver -->
-    <Color x:Key="AppTextMutedColor">#828E98</Color>           <!-- muted metadata / tags -->
+    <!-- ── Colors: text (spec §3.1) ─────────────────────────────────────── -->
+    <Color x:Key="AppTextPrimaryColor">#F4F0FF</Color>
+    <Color x:Key="AppTextSecondaryColor">#B8B2CC</Color>
+    <Color x:Key="AppTextMutedColor">#918BA7</Color>
 
-    <!-- ── Colors: status ─────────────────────────────────────────────── -->
-    <Color x:Key="SuccessColor">#34D399</Color>                <!-- semantic green -->
-    <Color x:Key="WarningColor">#FBBF24</Color>                <!-- semantic amber -->
-    <Color x:Key="ErrorColor">#F87171</Color>                  <!-- semantic red -->
+    <!-- ── Colors: status (spec §3.1) ───────────────────────────────────── -->
+    <Color x:Key="SuccessColor">#86EFAC</Color>                <!-- confirmed healthy/success -->
+    <Color x:Key="WarningColor">#FCD34D</Color>                <!-- warning state -->
+    <Color x:Key="ErrorColor">#FDA4AF</Color>                  <!-- error state -->
 
-    <!-- ── Brushes: surfaces ──────────────────────────────────────────── -->
+    <!-- ── Brushes: surfaces (spec §3.1, §3.3) ──────────────────────────── -->
     <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource AppBackgroundPrimaryColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource AppBackgroundSecondaryColor}" />
     <SolidColorBrush x:Key="RaisedSurfaceBrush" Color="{StaticResource AppBackgroundTertiaryColor}" />
@@ -48,67 +48,67 @@
 
     <!-- Precision extrusion: subtle lit top edge to dark bottom edge -->
     <LinearGradientBrush x:Key="ClayEdgeBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#3E464E" Offset="0"/>
-        <GradientStop Color="#2E343A" Offset="0.5"/>
-        <GradientStop Color="#181B1E" Offset="1"/>
+        <GradientStop Color="#4A4166" Offset="0"/>
+        <GradientStop Color="#332C46" Offset="0.5"/>
+        <GradientStop Color="#1C1829" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Card face: solid charcoal / gunmetal panel surface -->
+    <!-- Card face: solid/subtle machined panel surface with restrained gradient -->
     <LinearGradientBrush x:Key="ClayCardFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#1E2226" Offset="0"/>
-        <GradientStop Color="#1A1D20" Offset="0.5"/>
-        <GradientStop Color="#16181B" Offset="1"/>
+        <GradientStop Color="#252136" Offset="0"/>
+        <GradientStop Color="#201C2F" Offset="0.5"/>
+        <GradientStop Color="#1C1929" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="ClayCardFaceHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#252A2F" Offset="0"/>
-        <GradientStop Color="#1E2327" Offset="0.5"/>
-        <GradientStop Color="#181C1F" Offset="1"/>
+        <GradientStop Color="#2C2740" Offset="0"/>
+        <GradientStop Color="#252137" Offset="0.5"/>
+        <GradientStop Color="#201C2E" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Recessed inset surface for meters/graphs/wells: near-black -->
+    <!-- Recessed inset surface for meters/graphs/wells: darker top gives pressed-in depth -->
     <LinearGradientBrush x:Key="ClayInsetBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#090A0B" Offset="0"/>
-        <GradientStop Color="#0C0E10" Offset="0.4"/>
-        <GradientStop Color="#101315" Offset="1"/>
+        <GradientStop Color="#12101C" Offset="0"/>
+        <GradientStop Color="#161424" Offset="0.4"/>
+        <GradientStop Color="#1A182A" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- Recessed inset border: dark top shadow, faint bottom bounce -->
     <LinearGradientBrush x:Key="ClayInsetBorderBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#050607" Offset="0"/>
-        <GradientStop Color="#1B2024" Offset="0.5"/>
-        <GradientStop Color="#2C333A" Offset="1"/>
+        <GradientStop Color="#0D0B16" Offset="0"/>
+        <GradientStop Color="#221D33" Offset="0.5"/>
+        <GradientStop Color="#3B3256" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Primary button face: crisp signal cyan with tactile depth -->
+    <!-- Primary button face: crisp precision accent with tactile depth -->
     <LinearGradientBrush x:Key="ClayPrimaryFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#52DDF7" Offset="0"/>
-        <GradientStop Color="#42D9F5" Offset="0.55"/>
-        <GradientStop Color="#26CCE8" Offset="1"/>
+        <GradientStop Color="#B392FA" Offset="0"/>
+        <GradientStop Color="#9B73F7" Offset="0.55"/>
+        <GradientStop Color="#8352EB" Offset="1"/>
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="ClayPrimaryFaceHoverBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#6DE4F9" Offset="0"/>
-        <GradientStop Color="#52E0F8" Offset="0.5"/>
-        <GradientStop Color="#36D4EE" Offset="1"/>
+        <GradientStop Color="#C4A8FF" Offset="0"/>
+        <GradientStop Color="#AB88FF" Offset="0.5"/>
+        <GradientStop Color="#9366F5" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Primary button pressed face: deeper signal cyan -->
+    <!-- Primary button pressed face: recessed darker accent -->
     <LinearGradientBrush x:Key="ClayPrimaryFacePressedBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#1BAFC9" Offset="0"/>
-        <GradientStop Color="#22B8D3" Offset="1"/>
+        <GradientStop Color="#6E3ED6" Offset="0"/>
+        <GradientStop Color="#7F4FE6" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- Nav rail selected item face: dark charcoal plinth -->
+    <!-- Nav rail selected item face -->
     <LinearGradientBrush x:Key="ClayNavSelectedFaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#23292F" Offset="0"/>
-        <GradientStop Color="#1B1F23" Offset="1"/>
+        <GradientStop Color="#382A5E" Offset="0"/>
+        <GradientStop Color="#271C44" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- Shadow-like dark gradient for card depth -->
     <LinearGradientBrush x:Key="CardOuterShadowBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#0E1012" Offset="0"/>
-        <GradientStop Color="#050607" Offset="1"/>
+        <GradientStop Color="#141120" Offset="0"/>
+        <GradientStop Color="#0A0812" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- Inner highlight for raised surfaces -->
@@ -152,16 +152,16 @@
     <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, monospace</FontFamily>
 
     <!-- Restrained depth effects (spec §3.3, §14) -->
-    <DropShadowEffect x:Key="AccentGlowEffect" Color="#000000"
-                      BlurRadius="6" ShadowDepth="1" Opacity="0.25" RenderingBias="Performance"/>
-    <DropShadowEffect x:Key="TelemetryGlowEffect" Color="#000000"
-                      BlurRadius="6" ShadowDepth="1" Opacity="0.25" RenderingBias="Performance"/>
-    <DropShadowEffect x:Key="ButtonGlowEffect" Color="#000000"
-                      BlurRadius="6" ShadowDepth="2" Direction="270" Opacity="0.30" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="AccentGlowEffect" Color="{StaticResource AppAccentColor}"
+                      BlurRadius="8" ShadowDepth="0" Opacity="0.30" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="TelemetryGlowEffect" Color="{StaticResource AppTelemetryColor}"
+                      BlurRadius="8" ShadowDepth="0" Opacity="0.30" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="ButtonGlowEffect" Color="{StaticResource AppAccentColor}"
+                      BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.30" RenderingBias="Performance"/>
 
     <!-- Restrained contact shadow for precision card depth -->
-    <DropShadowEffect x:Key="CardShadowEffect" Color="#000000" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.35" RenderingBias="Performance"/>
-    <DropShadowEffect x:Key="RaisedCardShadowEffect" Color="#000000" BlurRadius="12" ShadowDepth="3" Direction="270" Opacity="0.40" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="CardShadowEffect" Color="#000000" BlurRadius="10" ShadowDepth="2" Direction="270" Opacity="0.35" RenderingBias="Performance"/>
+    <DropShadowEffect x:Key="RaisedCardShadowEffect" Color="#000000" BlurRadius="14" ShadowDepth="4" Direction="270" Opacity="0.45" RenderingBias="Performance"/>
 
     <!-- ══════════════════════════════════════════════════════════════════
          TEXT STYLES / TYPE SCALE (spec §3.4)
@@ -372,7 +372,7 @@
                     <Grid Background="Transparent">
                         <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="4">
                             <Border.Effect>
-                                <DropShadowEffect Color="#000000" BlurRadius="6" ShadowDepth="2" Direction="270" Opacity="0.25" RenderingBias="Performance"/>
+                                <DropShadowEffect Color="{StaticResource AppAccentColor}" BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.30" RenderingBias="Performance"/>
                             </Border.Effect>
                         </Border>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
@@ -1034,3 +1034,4 @@
     <Style x:Key="ClaySectionTitle" TargetType="TextBlock" BasedOn="{StaticResource SectionHeadingStyle}"/>
 
 </ResourceDictionary>
+

@@ -23,17 +23,17 @@ public static class GameArtService
 {
     private static readonly ConcurrentDictionary<string, ImageSource> Cache = new(StringComparer.OrdinalIgnoreCase);
 
-    // Curated precision gradients (graphite / titanium / signal cyan / slate family) — engineered, neutral, and premium.
+    // Curated clay-compatible gradients (violet / cyan / magenta family) — premium, not random hues.
     private static readonly (Color Top, Color Bottom)[] Gradients =
     {
-        (Color.FromRgb(0x22, 0x27, 0x2B), Color.FromRgb(0x11, 0x13, 0x15)), // graphite
-        (Color.FromRgb(0x2C, 0x33, 0x39), Color.FromRgb(0x1A, 0x1D, 0x20)), // titanium
-        (Color.FromRgb(0x16, 0x32, 0x3B), Color.FromRgb(0x0C, 0x1E, 0x24)), // signal cyan dark
-        (Color.FromRgb(0x28, 0x35, 0x42), Color.FromRgb(0x13, 0x1B, 0x23)), // slate gunmetal
-        (Color.FromRgb(0x34, 0x3B, 0x41), Color.FromRgb(0x16, 0x19, 0x1C)), // brushed metal
-        (Color.FromRgb(0x1E, 0x2B, 0x37), Color.FromRgb(0x0D, 0x14, 0x1A)), // deep steel
-        (Color.FromRgb(0x1B, 0x3B, 0x32), Color.FromRgb(0x0A, 0x1F, 0x1A)), // tactical emerald
-        (Color.FromRgb(0x3B, 0x2E, 0x17), Color.FromRgb(0x20, 0x18, 0x0A)), // amber bronze
+        (Color.FromRgb(0x8B, 0x5C, 0xF6), Color.FromRgb(0x4C, 0x1D, 0x95)), // violet
+        (Color.FromRgb(0x22, 0xD3, 0xEE), Color.FromRgb(0x0E, 0x74, 0x90)), // cyan
+        (Color.FromRgb(0xEC, 0x48, 0x99), Color.FromRgb(0x83, 0x18, 0x43)), // magenta
+        (Color.FromRgb(0xA8, 0x55, 0xF7), Color.FromRgb(0x31, 0x2E, 0x81)), // violet→indigo
+        (Color.FromRgb(0x38, 0xBD, 0xF8), Color.FromRgb(0x6D, 0x28, 0xD9)), // sky→violet
+        (Color.FromRgb(0xF4, 0x72, 0xB6), Color.FromRgb(0x7C, 0x3A, 0xED)), // pink→violet
+        (Color.FromRgb(0x34, 0xD3, 0x99), Color.FromRgb(0x0F, 0x76, 0x6E)), // emerald→teal
+        (Color.FromRgb(0xFB, 0xBF, 0x24), Color.FromRgb(0xB4, 0x53, 0x09)), // amber→bronze
     };
 
     /// <summary>

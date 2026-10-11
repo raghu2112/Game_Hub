@@ -44,66 +44,66 @@ public partial class Hardware3DCoreView : UserControl
     {
         var modelGroup = new Model3DGroup();
 
-        // 1. Lighting Setup (Neutral industrial studio lighting with restrained cyan rim)
+        // 1. Lighting Setup
         // Ambient base light for soft global illumination
-        var ambientLight = new AmbientLight(Color.FromRgb(40, 46, 52));
+        var ambientLight = new AmbientLight(Color.FromRgb(55, 65, 81));
         modelGroup.Children.Add(ambientLight);
 
-        // Key directional light (crisp cool white)
+        // Key directional light (cool white)
         var keyLight = new DirectionalLight(
-            Color.FromRgb(240, 245, 250),
+            Color.FromRgb(240, 245, 255),
             new Vector3D(-1.5, -2.5, -2.0));
         modelGroup.Children.Add(keyLight);
 
-        // Fill directional light (neutral slate)
+        // Fill directional light (deep blue-grey)
         var fillLight = new DirectionalLight(
-            Color.FromRgb(70, 80, 90),
+            Color.FromRgb(80, 100, 130),
             new Vector3D(2.0, 1.0, 1.5));
         modelGroup.Children.Add(fillLight);
 
-        // Precision cyber rim light (controlled signal cyan edge highlight)
+        // Precision cyber rim light (cyan reflection on edges)
         var rimLight = new DirectionalLight(
-            Color.FromRgb(66, 217, 245),
+            Color.FromRgb(0, 216, 246),
             new Vector3D(1.0, -1.0, -1.0));
         modelGroup.Children.Add(rimLight);
 
-        // 2. Chassis Baseboard (Machined Graphite Plinth)
+        // 2. Chassis Baseboard (Machined Obsidian / Gunmetal Plinth)
         var baseBuilder = new MeshBuilder3D();
         baseBuilder.AddBox(new Point3D(0, -0.15, 0), 2.5, 0.12, 2.1);
         var baseMesh = baseBuilder.ToMesh();
 
         var baseMatGroup = new MaterialGroup();
-        baseMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(17, 19, 21))));
-        baseMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(35, 41, 48)), 15));
+        baseMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(20, 23, 32))));
+        baseMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(40, 48, 65)), 15));
         baseMatGroup.Freeze();
 
         modelGroup.Children.Add(new GeometryModel3D(baseMesh, baseMatGroup));
 
-        // 3. Processor IHS / Heat Spreader (Brushed Titanium Block)
+        // 3. Processor IHS / Heat Spreader (Titanium / Graphite Block)
         var ihsBuilder = new MeshBuilder3D();
         ihsBuilder.AddBox(new Point3D(0, 0.02, 0), 1.1, 0.10, 1.1);
         var ihsMesh = ihsBuilder.ToMesh();
 
         var ihsMatGroup = new MaterialGroup();
-        ihsMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(34, 39, 43))));
-        ihsMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(166, 175, 183)), 35));
+        ihsMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(42, 50, 69))));
+        ihsMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(160, 180, 210)), 35));
         ihsMatGroup.Freeze();
 
         modelGroup.Children.Add(new GeometryModel3D(ihsMesh, ihsMatGroup));
 
-        // 4. Silicon Core Die (Signal Cyan Reflective Element)
+        // 4. Silicon Core Die (Precision Cyan Reflective Element)
         var dieBuilder = new MeshBuilder3D();
         dieBuilder.AddBox(new Point3D(0, 0.11, 0), 0.55, 0.04, 0.55);
         var dieMesh = dieBuilder.ToMesh();
 
         var dieMatGroup = new MaterialGroup();
-        dieMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(66, 217, 245))));
+        dieMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(0, 216, 246))));
         dieMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(200, 245, 255)), 80));
         dieMatGroup.Freeze();
 
         modelGroup.Children.Add(new GeometryModel3D(dieMesh, dieMatGroup));
 
-        // 5. Dual Cooling Fin Stacks (Dark Aluminum Dissipation Fins)
+        // 5. Dual Cooling Fin Stacks (Precision Heat Dissipation Fins)
         var finsBuilder = new MeshBuilder3D();
         // Left Fin Array
         for (int i = 0; i < 5; i++)
@@ -120,13 +120,13 @@ public partial class Hardware3DCoreView : UserControl
         var finsMesh = finsBuilder.ToMesh();
 
         var finsMatGroup = new MaterialGroup();
-        finsMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(26, 29, 32))));
-        finsMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(80, 90, 100)), 25));
+        finsMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(30, 37, 53))));
+        finsMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(100, 120, 150)), 25));
         finsMatGroup.Freeze();
 
         modelGroup.Children.Add(new GeometryModel3D(finsMesh, finsMatGroup));
 
-        // 6. Thermal Heatpipe Standoffs (Precision Copper Alloy)
+        // 6. Thermal Heatpipe Standoffs (Cylindrical Pillars)
         var pipesBuilder = new MeshBuilder3D();
         pipesBuilder.AddCylinder(new Point3D(-0.45, -0.05, -0.45), 0.04, 0.28, 12);
         pipesBuilder.AddCylinder(new Point3D(0.45, -0.05, -0.45), 0.04, 0.28, 12);
@@ -136,7 +136,7 @@ public partial class Hardware3DCoreView : UserControl
 
         var pipesMatGroup = new MaterialGroup();
         pipesMatGroup.Children.Add(new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(180, 110, 60)))); // Copper alloy
-        pipesMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(220, 150, 90)), 40));
+        pipesMatGroup.Children.Add(new SpecularMaterial(new SolidColorBrush(Color.FromRgb(230, 160, 100)), 40));
         pipesMatGroup.Freeze();
 
         modelGroup.Children.Add(new GeometryModel3D(pipesMesh, pipesMatGroup));

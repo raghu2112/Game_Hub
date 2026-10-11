@@ -164,25 +164,21 @@
                 </Grid>
             </Grid>
 
-            <!-- ═══════════ TELEMETRY INSTRUMENT CONSOLE ═══════════ -->
-            <Border Style="{StaticResource ClayCard}" Margin="0,0,0,20" Padding="16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <!-- Col 0: Primary Processor Radial Instrument -->
-                        <ColumnDefinition Width="190"/>
-                        <!-- Col 1: Vertical Divider -->
-                        <ColumnDefinition Width="1"/>
-                        <!-- Col 2: High-Density Linear Telemetry Meters (GPU, RAM, Thermals) -->
-                        <ColumnDefinition Width="*"/>
-                        <!-- Col 3: Vertical Divider -->
-                        <ColumnDefinition Width="1"/>
-                        <!-- Col 4: System Health & Diagnostic Confidence Badge -->
-                        <ColumnDefinition Width="200"/>
-                    </Grid.ColumnDefinitions>
+            <!-- ═══════════ TELEMETRY GAUGE DOCK (spec §5.2) ═══════════ -->
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Col 0: Primary CPU Dial with direct clock and core load -->
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                        <TextBlock Text="PRIMARY PROCESSOR" Style="{StaticResource TechnicalLabelStyle}" Margin="0,0,0,8"/>
+                <!-- CPU Core Load -->
+                <Border Grid.Column="0" Style="{StaticResource ClayStatTile}">
+                    <StackPanel>
                         <controls:CircularGauge Value="{Binding CpuPercent}" Label="CPU CORE"
                                                 AccentBrush="{StaticResource PrimaryAccentBrush}" Height="110"/>
                         <TextBlock Text="{Binding CpuUsage}" Style="{StaticResource TelemetryLabelStyle}"
@@ -192,88 +188,50 @@
                                    HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
                                    ToolTip="{Binding CpuDetails}"/>
                     </StackPanel>
+                </Border>
 
-                    <!-- Divider 1 -->
-                    <Rectangle Grid.Column="1" Fill="{StaticResource AppBorder}" Margin="0,4"/>
+                <!-- GPU Core Load -->
+                <Border Grid.Column="2" Style="{StaticResource ClayStatTile}">
+                    <StackPanel>
+                        <controls:CircularGauge Value="{Binding GpuPercent}" Label="GPU LOAD"
+                                                AccentBrush="{StaticResource TelemetryAccentBrush}" Height="110"/>
+                        <TextBlock Text="{Binding GpuUsage}" Style="{StaticResource TelemetryLabelStyle}"
+                                   HorizontalAlignment="Center" Margin="0,6,0,2"/>
+                        <TextBlock Text="{Binding GpuDetails}"
+                                   Foreground="{StaticResource TextMutedBrush}" FontSize="10"
+                                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding GpuDetails}"/>
+                    </StackPanel>
+                </Border>
 
-                    <!-- Col 2: Linear Precision Meters (GPU, RAM, Thermals) -->
-                    <Grid Grid.Column="2" Margin="20,0,20,0" VerticalAlignment="Center">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                <!-- Memory Allocation -->
+                <Border Grid.Column="4" Style="{StaticResource ClayStatTile}">
+                    <StackPanel>
+                        <controls:CircularGauge Value="{Binding RamPercent}" Label="MEMORY"
+                                                AccentBrush="{StaticResource SecondaryAccentBrush}" Height="110"/>
+                        <TextBlock Text="{Binding RamUsage}" Style="{StaticResource TelemetryLabelStyle}"
+                                   HorizontalAlignment="Center" Margin="0,6,0,2"/>
+                        <TextBlock Text="{Binding RamDetails}"
+                                   Foreground="{StaticResource TextMutedBrush}" FontSize="10"
+                                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding RamDetails}"/>
+                    </StackPanel>
+                </Border>
 
-                        <!-- GPU Meter -->
-                        <StackPanel Grid.Row="0" Margin="0,0,0,14">
-                            <Grid Margin="0,0,0,4">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="GPU LOAD" Style="{StaticResource TechnicalLabelStyle}" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding GpuDetails}" Foreground="{StaticResource TextMutedBrush}"
-                                               FontSize="10" TextTrimming="CharacterEllipsis" MaxWidth="220" ToolTip="{Binding GpuDetails}"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding GpuUsage}" Style="{StaticResource TelemetryLabelStyle}"
-                                           HorizontalAlignment="Right" Foreground="{StaticResource PrimaryAccentBrush}"/>
-                            </Grid>
-                            <controls:MeterBar Value="{Binding GpuPercent}" BarHeight="7"
-                                               FillBrush="{StaticResource PrimaryAccentBrush}"
-                                               TrackBrush="{StaticResource InsetSurfaceBrush}"/>
-                        </StackPanel>
-
-                        <!-- RAM Meter -->
-                        <StackPanel Grid.Row="1" Margin="0,0,0,14">
-                            <Grid Margin="0,0,0,4">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="SYSTEM MEMORY" Style="{StaticResource TechnicalLabelStyle}" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding RamDetails}" Foreground="{StaticResource TextMutedBrush}"
-                                               FontSize="10" TextTrimming="CharacterEllipsis" MaxWidth="220" ToolTip="{Binding RamDetails}"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding RamUsage}" Style="{StaticResource TelemetryLabelStyle}"
-                                           HorizontalAlignment="Right" Foreground="{StaticResource SecondaryAccentBrush}"/>
-                            </Grid>
-                            <controls:MeterBar Value="{Binding RamPercent}" BarHeight="7"
-                                               FillBrush="{StaticResource SecondaryAccentBrush}"
-                                               TrackBrush="{StaticResource InsetSurfaceBrush}"/>
-                        </StackPanel>
-
-                        <!-- Thermal Sensor & Package Status -->
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="THERMAL PACKAGE" Style="{StaticResource TechnicalLabelStyle}"/>
-                                <TextBlock Text="{Binding Temperature, FallbackValue='Normal (Nominal)'}"
-                                           Foreground="{StaticResource TextPrimaryBrush}" FontSize="13"
-                                           FontWeight="SemiBold" Margin="0,3,0,0"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="POWER SUPPLY" Style="{StaticResource TechnicalLabelStyle}"/>
-                                <TextBlock Text="{Binding BatteryStatus, FallbackValue='AC Connected'}"
-                                           Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"
-                                           FontWeight="SemiBold" Margin="0,3,0,0"/>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-
-                    <!-- Divider 2 -->
-                    <Rectangle Grid.Column="3" Fill="{StaticResource AppBorder}" Margin="0,4"/>
-
-                    <!-- Col 4: System Health & Diagnostic Confidence Badge -->
-                    <StackPanel Grid.Column="4" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <TextBlock Text="DIAGNOSTIC HEALTH" Style="{StaticResource TechnicalLabelStyle}" Margin="0,0,0,8"/>
+                <!-- System Health & Integrity -->
+                <Border Grid.Column="6" Style="{StaticResource ClayStatTile}">
+                    <StackPanel>
                         <controls:CircularGauge Value="{Binding GamingHealthScore}" Label="SYS HEALTH"
                                                 CenterText="{Binding GamingHealthScore}"
-                                                AccentBrush="{StaticResource SuccessBrush}" Height="100"/>
+                                                AccentBrush="{StaticResource SuccessBrush}" Height="110"/>
                         <TextBlock Text="Calculated Health Index" Style="{StaticResource TelemetryLabelStyle}"
-                                   HorizontalAlignment="Center" Margin="0,4,0,2"/>
+                                   HorizontalAlignment="Center" Margin="0,6,0,2"/>
                         <TextBlock Text="Authoritative Diagnostic Engine"
-                                   Foreground="{StaticResource TextMutedBrush}" FontSize="9.5"
+                                   Foreground="{StaticResource TextMutedBrush}" FontSize="10"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
-                </Grid>
-            </Border>
+                </Border>
+            </Grid>
 
             <!-- ═══════════ LIVE TELEMETRY OSCILLOSCOPE (LAST 60 SECONDS) ═══════════ -->
             <Grid Margin="0,0,0,20">

@@ -53,11 +53,12 @@
 
                 <!-- GamerHub logo/identity -->
                 <StackPanel Grid.Row="0" Margin="0,18,0,12" HorizontalAlignment="Center">
-                    <Border Width="40" Height="40" CornerRadius="3"
-                            Background="{StaticResource RaisedSurfaceBrush}"
-                            BorderBrush="{StaticResource AppBorder}" BorderThickness="1">
-                        <TextBlock Text="GH" FontFamily="{StaticResource MonoFont}" FontSize="15"
-                                   FontWeight="Bold" Foreground="{StaticResource PrimaryAccentBrush}"
+                    <Border Width="42" Height="42" CornerRadius="12"
+                            Background="{StaticResource ClayPrimaryFaceBrush}"
+                            BorderBrush="{StaticResource ClayEdgeBrush}" BorderThickness="1.5"
+                            Effect="{StaticResource ButtonGlowEffect}">
+                        <TextBlock Text="GH" FontFamily="{StaticResource HeaderFont}" FontSize="18"
+                                   FontWeight="Bold" Foreground="#FFFFFF"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </StackPanel>

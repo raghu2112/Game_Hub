@@ -54,7 +54,7 @@
                         <Border Style="{StaticResource ClayCard}" Margin="0,0,0,16"
                                 Visibility="{Binding PrimaryBottleneckName, Converter={StaticResource StringToVisibilityConverter}}">
                             <StackPanel>
-                                <TextBlock Text="PRIMARY BOTTLENECK ANALYSIS" Style="{StaticResource SubheaderStyle}"/>
+                                <TextBlock Text="WHY YOUR GAME MAY BE SLOW" Style="{StaticResource SubheaderStyle}"/>
                                 <TextBlock Text="{Binding PrimaryBottleneckName}" FontSize="21" FontWeight="Bold"
                                            Foreground="{StaticResource PrimaryAccentBrush}" Margin="0,10,0,5" TextWrapping="Wrap"/>
                                 <TextBlock Text="{Binding PrimaryBottleneckConfidence, StringFormat='Confidence: {0}'}"

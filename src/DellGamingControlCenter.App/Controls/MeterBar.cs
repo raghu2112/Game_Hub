@@ -24,7 +24,7 @@ public sealed class MeterBar : FrameworkElement
 
     public static readonly DependencyProperty FillBrushProperty = DependencyProperty.Register(
         nameof(FillBrush), typeof(Brush), typeof(MeterBar),
-        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x42, 0xD9, 0xF5)),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x8B, 0x5C, 0xF6)),
             FrameworkPropertyMetadataOptions.AffectsRender));
 
     public Brush FillBrush
@@ -35,7 +35,7 @@ public sealed class MeterBar : FrameworkElement
 
     public static readonly DependencyProperty TrackBrushProperty = DependencyProperty.Register(
         nameof(TrackBrush), typeof(Brush), typeof(MeterBar),
-        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x0C, 0x0E, 0x10)),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromRgb(0x20, 0x26, 0x38)),
             FrameworkPropertyMetadataOptions.AffectsRender));
 
     public Brush TrackBrush
@@ -65,7 +65,7 @@ public sealed class MeterBar : FrameworkElement
         double w = ActualWidth, h = BarHeight;
         if (w <= 0 || h <= 0) return;
 
-        double radius = 2.0;
+        double radius = h / 2;
         var trackRect = new Rect(0, 0, w, h);
         dc.DrawRoundedRectangle(TrackBrush, null, trackRect, radius, radius);
 
@@ -73,9 +73,13 @@ public sealed class MeterBar : FrameworkElement
         if (!unavailable)
         {
             double fillW = w * (Math.Clamp(Value, 0, 100) / 100.0);
-            if (fillW >= 1)
+            if (fillW >= h) // rounded fill needs at least a pill
             {
                 dc.DrawRoundedRectangle(FillBrush, null, new Rect(0, 0, fillW, h), radius, radius);
+            }
+            else if (fillW > 1)
+            {
+                dc.DrawRoundedRectangle(FillBrush, null, new Rect(0, 0, fillW, h), fillW / 2, fillW / 2);
             }
         }
     }
